@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人视频作品集 | Video Portfolio</title>
+    <title>彼岸之风 | 个人视频作品集 Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #08090d;
-            --bg-secondary: #11131c;
-            --accent-purple: #7000ff;
+            --bg-primary: #06070b;
+            --bg-secondary: #0d0f17;
+            --bg-tertiary: #131724;
+            --accent-purple: #7a22ff;
+            --accent-purple-glow: rgba(122, 34, 255, 0.4);
             --accent-cyan: #00f0ff;
+            --accent-cyan-glow: rgba(0, 240, 255, 0.4);
             --accent-pink: #ff007f;
             --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(20, 22, 36, 0.6);
+            --text-muted: #8e96a7;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --card-bg: rgba(18, 21, 35, 0.7);
+            --shadow-premium: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         * {
@@ -30,121 +34,165 @@
             color: var(--text-main);
             overflow-x: hidden;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(112, 0, 255, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.1) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(122, 34, 255, 0.18) 0px, transparent 40%),
+                radial-gradient(at 100% 50%, rgba(0, 240, 255, 0.12) 0px, transparent 40%),
+                radial-gradient(at 50% 100%, rgba(255, 0, 127, 0.08) 0px, transparent 40%);
             background-attachment: fixed;
             line-height: 1.6;
         }
 
-        /* Header / Navbar */
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-purple);
+        }
+
+        /* Navbar */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2rem;
+            padding: 1.5rem 3rem;
             max-width: 1400px;
             margin: 0 auto;
             border-bottom: 1px solid var(--border-color);
+            background: rgba(6, 7, 11, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            background: linear-gradient(135deg, var(--text-main), var(--accent-purple), var(--accent-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            font-size: 1.2rem;
+            color: var(--accent-cyan);
         }
 
         .contact-nav {
             display: flex;
-            gap: 1.5rem;
+            gap: 2rem;
         }
 
         .contact-link {
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid transparent;
         }
 
         .contact-link:hover {
             color: var(--accent-cyan);
+            border-color: rgba(0, 240, 255, 0.2);
+            background: rgba(0, 240, 255, 0.05);
         }
 
         /* Hero Section */
         .hero {
             max-width: 1400px;
-            margin: 4rem auto;
-            padding: 0 2rem;
+            margin: 5rem auto;
+            padding: 0 3rem;
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
-            gap: 4rem;
+            gap: 5rem;
             align-items: center;
         }
 
         .hero-left h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 1rem;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
         }
 
         .hero-left h1 span {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan), var(--accent-pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(122, 34, 255, 0.2);
         }
 
-        .hero-title {
-            font-size: 1.5rem;
+        .hero-tagline {
+            font-size: 1.1rem;
             color: var(--accent-cyan);
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
 
         .hero-desc {
             color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            max-width: 600px;
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            max-width: 650px;
+            font-weight: 300;
         }
 
         .hero-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .btn {
             display: inline-block;
-            padding: 0.8rem 2rem;
+            padding: 0.9rem 2.5rem;
             border-radius: 30px;
-            font-weight: 600;
+            font-weight: 700;
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
+            text-align: center;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
             color: white;
-            box-shadow: 0 4px 15px rgba(112, 0, 255, 0.4);
+            box-shadow: 0 8px 25px var(--accent-purple-glow);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(112, 0, 255, 0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(122, 34, 255, 0.6);
         }
 
         .btn-secondary {
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(5px);
         }
 
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .hero-right {
@@ -153,13 +201,28 @@
             position: relative;
         }
 
+        /* Premium Floating Avatar Frame */
+        .avatar-glow {
+            position: absolute;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
+            opacity: 0.3;
+            filter: blur(20px);
+            animation: pulse 4s infinite alternate;
+            z-index: 1;
+        }
+
         .avatar-frame {
             width: 320px;
             height: 320px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            padding: 4px;
-            box-shadow: 0 10px 30px rgba(112, 0, 255, 0.3);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan), var(--accent-pink));
+            padding: 3px;
+            position: relative;
+            z-index: 2;
+            animation: float 6s ease-in-out infinite;
         }
 
         .avatar-inner {
@@ -171,59 +234,85 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 4rem;
+            font-size: 5rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.2; }
+            100% { transform: scale(1.05); opacity: 0.4; }
         }
 
         /* Works Section */
         .works-section {
             max-width: 1400px;
-            margin: 6rem auto;
-            padding: 0 2rem;
+            margin: 8rem auto;
+            padding: 0 3rem;
         }
 
         .section-header {
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            border-left: 4px solid var(--accent-cyan);
-            padding-left: 1rem;
+            position: relative;
+        }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 2px;
         }
 
         .section-header h2 {
-            font-size: 2.2rem;
+            font-size: 2.6rem;
             font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .section-header p {
             color: var(--text-muted);
             margin-top: 0.5rem;
+            font-size: 1.1rem;
         }
 
         .works-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 2.5rem;
         }
 
+        /* Premium Work Card */
         .work-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
+            position: relative;
+            box-shadow: var(--shadow-premium);
         }
 
         .work-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 10px 25px rgba(0, 240, 255, 0.1);
+            transform: translateY(-8px);
+            border-color: rgba(0, 240, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 240, 255, 0.08), 0 0 25px rgba(122, 34, 255, 0.1);
         }
 
         .card-thumb {
             position: relative;
-            height: 180px;
+            height: 190px;
             background: #000;
             overflow: hidden;
         }
@@ -232,49 +321,139 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .work-card:hover .card-thumb img {
-            transform: scale(1.05);
+            transform: scale(1.08);
+        }
+
+        .card-hover-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 15, 23, 0.5);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s;
+        }
+
+        .work-card:hover .card-hover-overlay {
+            opacity: 1;
+        }
+
+        .play-btn-icon {
+            font-size: 2rem;
+            color: white;
+            background: var(--accent-purple);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px var(--accent-purple);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding-left: 4px;
+        }
+
+        .work-card:hover .play-btn-icon {
+            transform: scale(1);
         }
 
         .card-duration {
             position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            z-index: 3;
         }
 
         .card-rank {
             position: absolute;
-            top: 8px;
-            left: 8px;
+            top: 12px;
+            left: 12px;
             background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
             font-size: 0.75rem;
             font-weight: 800;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 3;
+            letter-spacing: 1px;
         }
 
         .card-body {
-            padding: 1.2rem;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 1rem;
         }
 
         .card-title {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 700;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: var(--text-main);
+        }
+
+        /* Premium Visual Metric Progress Bars */
+        .card-metric-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .metric-bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .bar-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        .bar-fill.sharp {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+        }
+
+        .bar-fill.color {
+            background: linear-gradient(90deg, var(--accent-cyan), #00ff87);
         }
 
         .card-meta {
@@ -282,31 +461,38 @@
             justify-content: space-between;
             font-size: 0.8rem;
             color: var(--text-muted);
+            align-items: center;
+        }
+
+        .card-score {
+            color: var(--accent-cyan);
+            font-weight: 700;
         }
 
         .card-tags {
             display: flex;
-            gap: 0.35rem;
+            gap: 0.4rem;
             flex-wrap: wrap;
         }
 
         .tag {
-            background: rgba(0, 240, 255, 0.08);
-            color: var(--accent-cyan);
-            border: 1px solid rgba(0, 240, 255, 0.15);
+            background: rgba(122, 34, 255, 0.08);
+            color: #b580ff;
+            border: 1px solid rgba(122, 34, 255, 0.2);
             font-size: 0.7rem;
-            padding: 0.15rem 0.4rem;
-            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
         }
 
-        /* Video Modal Player */
+        /* Premium Video Modal Player */
         .player-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(3, 4, 7, 0.93);
             z-index: 1000;
             display: none;
             justify-content: center;
@@ -323,46 +509,94 @@
         .modal-content {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 24px;
             width: 90%;
-            max-width: 960px;
+            max-width: 1100px;
             overflow: hidden;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
             position: relative;
             transform: scale(0.95);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: grid;
+            grid-template-columns: 2.3fr 1fr;
         }
 
         .player-modal.active .modal-content {
             transform: scale(1);
         }
 
+        .modal-left {
+            background: #000;
+            aspect-ratio: 16/9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .modal-video-container {
             width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
+            height: 100%;
         }
 
         .modal-video-container video {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
-        .modal-info {
-            padding: 1.5rem 2rem;
+        .modal-right {
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .modal-detail-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .modal-specs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: rgba(255,255,255,0.02);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .spec-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .spec-label {
+            color: var(--text-muted);
+        }
+
+        .spec-value {
+            font-weight: 700;
+            color: var(--text-main);
         }
 
         .modal-close {
             position: absolute;
-            top: 1rem;
+            top: 1.5rem;
             right: 1.5rem;
-            background: rgba(0,0,0,0.5);
-            border: none;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
             color: white;
-            font-size: 2rem;
+            font-size: 1.5rem;
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -371,19 +605,22 @@
             justify-content: center;
             align-items: center;
             z-index: 10;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
 
         .modal-close:hover {
             background: var(--accent-pink);
+            border-color: transparent;
+            transform: rotate(90deg);
         }
 
         /* Footer / Contact */
         footer {
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
-            padding: 4rem 2rem;
+            padding: 6rem 3rem 4rem 3rem;
             text-align: center;
+            position: relative;
         }
 
         .footer-content {
@@ -391,25 +628,35 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 2rem;
             align-items: center;
         }
 
         .footer-title {
-            font-size: 2rem;
+            font-size: 2.4rem;
             font-weight: 800;
+            background: linear-gradient(135deg, var(--text-main), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .qr-frame {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            padding: 3px;
+            border-radius: 16px;
+            margin: 1rem 0;
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
         }
 
         .qr-placeholder {
-            width: 150px;
-            height: 150px;
-            background: white;
-            padding: 10px;
-            border-radius: 12px;
+            width: 160px;
+            height: 160px;
+            background: #fff;
+            border-radius: 13px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 1rem 0;
+            padding: 10px;
         }
 
         .qr-placeholder span {
@@ -418,38 +665,93 @@
             font-size: 0.9rem;
         }
 
+        .contact-info-list {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .contact-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .contact-item span {
+            color: var(--accent-cyan);
+            margin-right: 0.5rem;
+        }
+
         .footer-meta {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            width: 100%;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 3rem;
+                margin: 3rem auto;
+            }
+            .hero-left h1 {
+                font-size: 3rem;
+            }
+            .hero-desc {
+                margin: 0 auto 2rem auto;
+            }
+            .hero-buttons {
+                justify-content: center;
+            }
+            .modal-content {
+                grid-template-columns: 1fr;
+            }
+            .modal-right {
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav>
-        <div class="logo">PORTFOLIO.</div>
+        <div class="logo"><span>✨</span> 彼岸之风</div>
         <div class="contact-nav">
-            <a href="#contact" class="contact-link">联系我</a>
+            <a href="#works" class="contact-link">作品精选</a>
+            <a href="#contact" class="contact-link">联络合作</a>
         </div>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
         <div class="hero-left">
-            <div class="hero-title">VIDEO CREATOR & EDITOR</div>
-            <h1>我是 <span>您的名字</span></h1>
+            <div class="hero-tagline">Video Artist & Post Production</div>
+            <h1>我是 <span>彼岸之风</span></h1>
             <p class="hero-desc">
-                专注高质量视频剪辑、调色与后期特效制作。拥有丰富的商业作品制作经验，致力于为品牌和内容创作注入极致视觉表现力。这是我为您精选的作品集演示。
+                专注高质量视频剪辑、电影级调色与后期特效创作。用镜头结构故事，用色彩渲染情绪。这是我为您精选的作品集，集结了最出彩的视觉创作案例。
             </p>
             <div class="hero-buttons">
-                <a href="#works" class="btn btn-primary">浏览作品集</a>
-                <a href="#contact" class="btn btn-secondary">联系合作</a>
+                <a href="#works" class="btn btn-primary">进入作品集</a>
+                <a href="#contact" class="btn btn-secondary">立即联络</a>
             </div>
         </div>
         <div class="hero-right">
+            <div class="avatar-glow"></div>
             <div class="avatar-frame">
                 <div class="avatar-inner">
-                    🎥
+                    🌌
                 </div>
             </div>
         </div>
@@ -459,156 +761,389 @@
     <section class="works-section" id="works">
         <div class="section-header">
             <div>
-                <h2>精选作品展示</h2>
-                <p>AI 智能筛选的最佳剪辑与成片案例</p>
-            </div>
-            <div style="color: var(--text-muted); font-size: 0.9rem;">
-                点击卡片在线播放
+                <h2>核心成片案例</h2>
+                <p>经由 AI 智能评估筛选的 Top 10 最佳视觉成片</p>
             </div>
         </div>
         
         <div class="works-grid">
             
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215000_859.mp4', '微信视频2026-06-26_215000_859.mp4', '26.7秒', '1080x1920', '87.3')">
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215000_859.mp4', '微信视频2026-06-26_215000_859.mp4', '26.7秒', '1080x1920', '87.3', 43, 83, 84)">
                 <div class="card-thumb">
                     <img src="thumbnails/微信视频2026-06-26_215000_859_thumb_1.jpg" alt="微信视频2026-06-26_215000_859.mp4" loading="lazy">
                     <span class="card-duration">26.7s</span>
                     <span class="card-rank">TOP 1</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h3 class="card-title" title="微信视频2026-06-26_215000_859.mp4">微信视频2026-06-26_215000_859.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 43%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 83%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="card-meta">
                         <span>尺寸: 1080x1920</span>
-                        <span>综合评分: 87.3</span>
+                        <span class="card-score">评分: 87.3</span>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220209_084.mp4', '微信视频2026-06-26_220209_084.mp4', '15.1秒', '1080x1920', '87.0')">
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220209_084.mp4', '微信视频2026-06-26_220209_084.mp4', '15.1秒', '1080x1920', '87.0', 45, 81, 80)">
                 <div class="card-thumb">
                     <img src="thumbnails/微信视频2026-06-26_220209_084_thumb_1.jpg" alt="微信视频2026-06-26_220209_084.mp4" loading="lazy">
                     <span class="card-duration">15.1s</span>
                     <span class="card-rank">TOP 2</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h3 class="card-title" title="微信视频2026-06-26_220209_084.mp4">微信视频2026-06-26_220209_084.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 81%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="card-meta">
                         <span>尺寸: 1080x1920</span>
-                        <span>综合评分: 87.0</span>
+                        <span class="card-score">评分: 87.0</span>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215806_427.mp4', '微信视频2026-06-26_215806_427.mp4', '15.1秒', '1080x1920', '86.1')">
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215806_427.mp4', '微信视频2026-06-26_215806_427.mp4', '15.1秒', '1080x1920', '86.1', 34, 68, 90)">
                 <div class="card-thumb">
                     <img src="thumbnails/微信视频2026-06-26_215806_427_thumb_1.jpg" alt="微信视频2026-06-26_215806_427.mp4" loading="lazy">
                     <span class="card-duration">15.1s</span>
                     <span class="card-rank">TOP 3</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h3 class="card-title" title="微信视频2026-06-26_215806_427.mp4">微信视频2026-06-26_215806_427.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 34%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 68%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="card-meta">
                         <span>尺寸: 1080x1920</span>
-                        <span>综合评分: 86.1</span>
+                        <span class="card-score">评分: 86.1</span>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220851_987.mp4', '微信视频2026-06-26_220851_987.mp4', '15.1秒', '1080x1920', '84.8')">
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220851_987.mp4', '微信视频2026-06-26_220851_987.mp4', '15.1秒', '1080x1920', '84.8', 34, 73, 73)">
                 <div class="card-thumb">
                     <img src="thumbnails/微信视频2026-06-26_220851_987_thumb_1.jpg" alt="微信视频2026-06-26_220851_987.mp4" loading="lazy">
                     <span class="card-duration">15.1s</span>
                     <span class="card-rank">TOP 4</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h3 class="card-title" title="微信视频2026-06-26_220851_987.mp4">微信视频2026-06-26_220851_987.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 34%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 73%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="card-meta">
                         <span>尺寸: 1080x1920</span>
-                        <span>综合评分: 84.8</span>
+                        <span class="card-score">评分: 84.8</span>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215233_394.mp4', '微信视频2026-06-26_215233_394.mp4', '30.0秒', '1080x1920', '84.6')">
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215233_394.mp4', '微信视频2026-06-26_215233_394.mp4', '30.0秒', '1080x1920', '84.6', 42, 76, 82)">
                 <div class="card-thumb">
                     <img src="thumbnails/微信视频2026-06-26_215233_394_thumb_1.jpg" alt="微信视频2026-06-26_215233_394.mp4" loading="lazy">
                     <span class="card-duration">30.0s</span>
                     <span class="card-rank">TOP 5</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h3 class="card-title" title="微信视频2026-06-26_215233_394.mp4">微信视频2026-06-26_215233_394.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 42%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 76%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="card-meta">
                         <span>尺寸: 1080x1920</span>
-                        <span>综合评分: 84.6</span>
+                        <span class="card-score">评分: 84.6</span>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220553_595.mp4', '微信视频2026-06-26_220553_595.mp4', '15.1秒', '1080x1920', '84.5')">
-                <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_220553_595_thumb_1.jpg" alt="微信视频2026-06-26_220553_595.mp4" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 6</span>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_220553_595.mp4">微信视频2026-06-26_220553_595.mp4</h3>
-                    <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span>综合评分: 84.5</span>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_221243_803.mp4', '微信视频2026-06-26_221243_803.mp4', '15.1秒', '1080x1920', '84.3')">
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_221243_803.mp4', '微信视频2026-06-26_221243_803.mp4', '15.1秒', '1080x1920', '84.3', 50, 60, 77)">
                 <div class="card-thumb">
                     <img src="thumbnails/微信视频2026-06-26_221243_803_thumb_1.jpg" alt="微信视频2026-06-26_221243_803.mp4" loading="lazy">
                     <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 7</span>
+                    <span class="card-rank">TOP 6</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h3 class="card-title" title="微信视频2026-06-26_221243_803.mp4">微信视频2026-06-26_221243_803.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="card-meta">
                         <span>尺寸: 1080x1920</span>
-                        <span>综合评分: 84.3</span>
+                        <span class="card-score">评分: 84.3</span>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_221328_068.mp4', '微信视频2026-06-26_221328_068.mp4', '15.1秒', '1080x1920', '83.8')">
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_221328_068.mp4', '微信视频2026-06-26_221328_068.mp4', '15.1秒', '1080x1920', '83.8', 57, 62, 67)">
                 <div class="card-thumb">
                     <img src="thumbnails/微信视频2026-06-26_221328_068_thumb_1.jpg" alt="微信视频2026-06-26_221328_068.mp4" loading="lazy">
                     <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 8</span>
+                    <span class="card-rank">TOP 7</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h3 class="card-title" title="微信视频2026-06-26_221328_068.mp4">微信视频2026-06-26_221328_068.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 57%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 62%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="card-meta">
                         <span>尺寸: 1080x1920</span>
-                        <span>综合评分: 83.8</span>
+                        <span class="card-score">评分: 83.8</span>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220934_514.mp4', '微信视频2026-06-26_220934_514.mp4', '15.1秒', '1080x1920', '83.1', 35, 56, 77)">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_220934_514_thumb_1.jpg" alt="微信视频2026-06-26_220934_514.mp4" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <span class="card-rank">TOP 8</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_220934_514.mp4">微信视频2026-06-26_220934_514.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 35%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 56%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span class="card-score">评分: 83.1</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220055_274.mp4', '微信视频2026-06-26_220055_274.mp4', '30.3秒', '1080x1920', '82.5', 27, 60, 89)">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_220055_274_thumb_1.jpg" alt="微信视频2026-06-26_220055_274.mp4" loading="lazy">
+                    <span class="card-duration">30.3s</span>
+                    <span class="card-rank">TOP 9</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_220055_274.mp4">微信视频2026-06-26_220055_274.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 27%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span class="card-score">评分: 82.5</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220133_754.mp4', '微信视频2026-06-26_220133_754.mp4', '30.2秒', '1080x1920', '81.2', 64, 47, 75)">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_220133_754_thumb_1.jpg" alt="微信视频2026-06-26_220133_754.mp4" loading="lazy">
+                    <span class="card-duration">30.2s</span>
+                    <span class="card-rank">TOP 10</span>
+                    <div class="card-hover-overlay">
+                        <span class="play-btn-icon">▶</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_220133_754.mp4">微信视频2026-06-26_220133_754.mp4</h3>
+                    
+                    <!-- Premium metric bars -->
+                    <div class="card-metric-bars">
+                        <div class="metric-bar-item">
+                            <span class="bar-label">画面清晰度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill sharp" style="width: 64%"></div>
+                            </div>
+                        </div>
+                        <div class="metric-bar-item">
+                            <span class="bar-label">色彩丰富度</span>
+                            <div class="bar-track">
+                                <div class="bar-fill color" style="width: 47%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span class="card-score">评分: 81.2</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
                     </div>
                 </div>
             </div>
@@ -619,20 +1154,24 @@
     <!-- Contact Footer -->
     <footer id="contact">
         <div class="footer-content">
-            <div class="footer-title">期待与您的合作</div>
-            <p style="color: var(--text-muted); max-width: 500px;">
-                如果您对我的剪辑风格或摄影作品感兴趣，欢迎通过以下方式取得联系，我们可以讨论更多创作可能！
+            <div class="footer-title">与我联合创作</div>
+            <p style="color: var(--text-muted); max-width: 550px; font-size: 1.05rem;">
+                对我的镜头节奏或色彩风格感兴趣？欢迎扫码加微信，或通过以下方式取得联系。期待我们的下一次深度合作！
             </p>
             
-            <div class="qr-placeholder">
-                <!-- Replace this text with an actual QR code image path later -->
-                <span>[ 微信二维码 ]</span>
+            <div class="qr-frame">
+                <div class="qr-placeholder">
+                    <span>[ 微信二维码 ]</span>
+                </div>
             </div>
             
-            <p style="font-weight: 600;">微信: YourWeChatId | 电话: YourPhoneNumber</p>
+            <div class="contact-info-list">
+                <div class="contact-item"><span>微信:</span> YourWeChatId</div>
+                <div class="contact-item"><span>电话:</span> YourPhoneNumber</div>
+            </div>
             
             <div class="footer-meta">
-                &copy; 2026 Personal Portfolio. All rights reserved. Created with AI assistance.
+                &copy; 2026 彼岸之风. All rights reserved. Created with AI Visual Algorithm.
             </div>
         </div>
     </footer>
@@ -641,14 +1180,32 @@
     <div class="player-modal" id="player-modal">
         <button class="modal-close" onclick="closePlayer()">&times;</button>
         <div class="modal-content">
-            <div class="modal-video-container">
-                <video id="modal-video" controls></video>
-            </div>
-            <div class="modal-info">
-                <div>
-                    <h3 id="modal-title" style="font-size: 1.1rem; font-weight: 700;">作品名</h3>
-                    <p id="modal-desc" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">时长 | 尺寸</p>
+            <div class="modal-left">
+                <div class="modal-video-container">
+                    <video id="modal-video" controls></video>
                 </div>
+            </div>
+            <div class="modal-right">
+                <div class="modal-detail-info">
+                    <h3 id="modal-title" class="modal-title">作品名称</h3>
+                    <div class="modal-specs">
+                        <div class="spec-row">
+                            <span class="spec-label">视频时长</span>
+                            <span id="spec-duration" class="spec-value">-</span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">原始尺寸</span>
+                            <span id="spec-resolution" class="spec-value">-</span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">面试评分</span>
+                            <span id="spec-score" class="spec-value" style="color: var(--accent-cyan);">-</span>
+                        </div>
+                    </div>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">
+                    * 视频文件已做 Web 端流式优化，以极低带宽保障高清播放体验。
+                </p>
             </div>
         </div>
     </div>
@@ -657,11 +1214,16 @@
         const modal = document.getElementById('player-modal');
         const video = document.getElementById('modal-video');
         const titleEl = document.getElementById('modal-title');
-        const descEl = document.getElementById('modal-desc');
+        const specDuration = document.getElementById('spec-duration');
+        const specResolution = document.getElementById('spec-resolution');
+        const specScore = document.getElementById('spec-score');
 
-        function openPlayer(videoUrl, title, duration, resolution, score) {
+        function openPlayer(videoUrl, title, duration, resolution, score, sharp, color, contrast) {
             titleEl.textContent = title;
-            descEl.textContent = `时长: ${duration} | 分辨率: ${resolution} | 综合评分: ${score}分`;
+            specDuration.textContent = duration;
+            specResolution.textContent = resolution;
+            specScore.textContent = score + " 分";
+            
             video.src = videoUrl;
             modal.classList.add('active');
             video.play();
