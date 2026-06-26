@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人视频作品集 | Video Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #08090d;
+            --bg-secondary: #11131c;
+            --accent-purple: #7000ff;
+            --accent-cyan: #00f0ff;
+            --accent-pink: #ff007f;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(20, 22, 36, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(112, 0, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            line-height: 1.6;
+        }
+
+        /* Header / Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .contact-nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .contact-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .contact-link:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-left h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .hero-left h1 span {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .hero-desc {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            color: white;
+            box-shadow: 0 4px 15px rgba(112, 0, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(112, 0, 255, 0.6);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-right {
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .avatar-frame {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            padding: 4px;
+            box-shadow: 0 10px 30px rgba(112, 0, 255, 0.3);
+        }
+
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+        }
+
+        /* Works Section */
+        .works-section {
+            max-width: 1400px;
+            margin: 6rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-left: 4px solid var(--accent-cyan);
+            padding-left: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .work-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .work-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 25px rgba(0, 240, 255, 0.1);
+        }
+
+        .card-thumb {
+            position: relative;
+            height: 180px;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .work-card:hover .card-thumb img {
+            transform: scale(1.05);
+        }
+
+        .card-duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .card-rank {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .card-body {
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(0, 240, 255, 0.08);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        /* Video Modal Player */
+        .player-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .player-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 960px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .player-modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-video-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+        }
+
+        .modal-video-container video {
+            width: 100%;
+            height: 100%;
+        }
+
+        .modal-info {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: background 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-pink);
+        }
+
+        /* Footer / Contact */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .footer-title {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .qr-placeholder span {
+            color: #000;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .footer-meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">PORTFOLIO.</div>
+        <div class="contact-nav">
+            <a href="#contact" class="contact-link">联系我</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-left">
+            <div class="hero-title">VIDEO CREATOR & EDITOR</div>
+            <h1>我是 <span>您的名字</span></h1>
+            <p class="hero-desc">
+                专注高质量视频剪辑、调色与后期特效制作。拥有丰富的商业作品制作经验，致力于为品牌和内容创作注入极致视觉表现力。这是我为您精选的作品集演示。
+            </p>
+            <div class="hero-buttons">
+                <a href="#works" class="btn btn-primary">浏览作品集</a>
+                <a href="#contact" class="btn btn-secondary">联系合作</a>
+            </div>
+        </div>
+        <div class="hero-right">
+            <div class="avatar-frame">
+                <div class="avatar-inner">
+                    🎥
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Works Grid -->
+    <section class="works-section" id="works">
+        <div class="section-header">
+            <div>
+                <h2>精选作品展示</h2>
+                <p>AI 智能筛选的最佳剪辑与成片案例</p>
+            </div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;">
+                点击卡片在线播放
+            </div>
+        </div>
+        
+        <div class="works-grid">
+            
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215000_859.mp4', '微信视频2026-06-26_215000_859.mp4', '26.7秒', '1080x1920', '87.3')">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_215000_859_thumb_1.jpg" alt="微信视频2026-06-26_215000_859.mp4" loading="lazy">
+                    <span class="card-duration">26.7s</span>
+                    <span class="card-rank">TOP 1</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_215000_859.mp4">微信视频2026-06-26_215000_859.mp4</h3>
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span>综合评分: 87.3</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220209_084.mp4', '微信视频2026-06-26_220209_084.mp4', '15.1秒', '1080x1920', '87.0')">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_220209_084_thumb_1.jpg" alt="微信视频2026-06-26_220209_084.mp4" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <span class="card-rank">TOP 2</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_220209_084.mp4">微信视频2026-06-26_220209_084.mp4</h3>
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span>综合评分: 87.0</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215806_427.mp4', '微信视频2026-06-26_215806_427.mp4', '15.1秒', '1080x1920', '86.1')">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_215806_427_thumb_1.jpg" alt="微信视频2026-06-26_215806_427.mp4" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <span class="card-rank">TOP 3</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_215806_427.mp4">微信视频2026-06-26_215806_427.mp4</h3>
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span>综合评分: 86.1</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220851_987.mp4', '微信视频2026-06-26_220851_987.mp4', '15.1秒', '1080x1920', '84.8')">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_220851_987_thumb_1.jpg" alt="微信视频2026-06-26_220851_987.mp4" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <span class="card-rank">TOP 4</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_220851_987.mp4">微信视频2026-06-26_220851_987.mp4</h3>
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span>综合评分: 84.8</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215233_394.mp4', '微信视频2026-06-26_215233_394.mp4', '30.0秒', '1080x1920', '84.6')">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_215233_394_thumb_1.jpg" alt="微信视频2026-06-26_215233_394.mp4" loading="lazy">
+                    <span class="card-duration">30.0s</span>
+                    <span class="card-rank">TOP 5</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_215233_394.mp4">微信视频2026-06-26_215233_394.mp4</h3>
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span>综合评分: 84.6</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220553_595.mp4', '微信视频2026-06-26_220553_595.mp4', '15.1秒', '1080x1920', '84.5')">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_220553_595_thumb_1.jpg" alt="微信视频2026-06-26_220553_595.mp4" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <span class="card-rank">TOP 6</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_220553_595.mp4">微信视频2026-06-26_220553_595.mp4</h3>
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span>综合评分: 84.5</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_221243_803.mp4', '微信视频2026-06-26_221243_803.mp4', '15.1秒', '1080x1920', '84.3')">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_221243_803_thumb_1.jpg" alt="微信视频2026-06-26_221243_803.mp4" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <span class="card-rank">TOP 7</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_221243_803.mp4">微信视频2026-06-26_221243_803.mp4</h3>
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span>综合评分: 84.3</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_221328_068.mp4', '微信视频2026-06-26_221328_068.mp4', '15.1秒', '1080x1920', '83.8')">
+                <div class="card-thumb">
+                    <img src="thumbnails/微信视频2026-06-26_221328_068_thumb_1.jpg" alt="微信视频2026-06-26_221328_068.mp4" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <span class="card-rank">TOP 8</span>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="微信视频2026-06-26_221328_068.mp4">微信视频2026-06-26_221328_068.mp4</h3>
+                    <div class="card-meta">
+                        <span>尺寸: 1080x1920</span>
+                        <span>综合评分: 83.8</span>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声成片</span>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+    </section>
+
+    <!-- Contact Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-title">期待与您的合作</div>
+            <p style="color: var(--text-muted); max-width: 500px;">
+                如果您对我的剪辑风格或摄影作品感兴趣，欢迎通过以下方式取得联系，我们可以讨论更多创作可能！
+            </p>
+            
+            <div class="qr-placeholder">
+                <!-- Replace this text with an actual QR code image path later -->
+                <span>[ 微信二维码 ]</span>
+            </div>
+            
+            <p style="font-weight: 600;">微信: YourWeChatId | 电话: YourPhoneNumber</p>
+            
+            <div class="footer-meta">
+                &copy; 2026 Personal Portfolio. All rights reserved. Created with AI assistance.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Video Modal Player -->
+    <div class="player-modal" id="player-modal">
+        <button class="modal-close" onclick="closePlayer()">&times;</button>
+        <div class="modal-content">
+            <div class="modal-video-container">
+                <video id="modal-video" controls></video>
+            </div>
+            <div class="modal-info">
+                <div>
+                    <h3 id="modal-title" style="font-size: 1.1rem; font-weight: 700;">作品名</h3>
+                    <p id="modal-desc" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">时长 | 尺寸</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('player-modal');
+        const video = document.getElementById('modal-video');
+        const titleEl = document.getElementById('modal-title');
+        const descEl = document.getElementById('modal-desc');
+
+        function openPlayer(videoUrl, title, duration, resolution, score) {
+            titleEl.textContent = title;
+            descEl.textContent = `时长: ${duration} | 分辨率: ${resolution} | 综合评分: ${score}分`;
+            video.src = videoUrl;
+            modal.classList.add('active');
+            video.play();
+        }
+
+        function closePlayer() {
+            modal.classList.remove('active');
+            video.pause();
+            video.src = '';
+        }
+
+        // Close on clicking outside modal content
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closePlayer();
+            }
+        });
+    </script>
+</body>
+</html>
