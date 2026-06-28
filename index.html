@@ -3,23 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>彼岸之风 | 个人视频作品集 Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Visionary 创想 | 视觉艺术作品集</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #06070b;
-            --bg-secondary: #0d0f17;
-            --bg-tertiary: #131724;
-            --accent-purple: #7a22ff;
-            --accent-purple-glow: rgba(122, 34, 255, 0.4);
-            --accent-cyan: #00f0ff;
-            --accent-cyan-glow: rgba(0, 240, 255, 0.4);
-            --accent-pink: #ff007f;
-            --text-main: #f3f4f6;
-            --text-muted: #8e96a7;
-            --border-color: rgba(255, 255, 255, 0.06);
-            --card-bg: rgba(18, 21, 35, 0.7);
-            --shadow-premium: 0 10px 30px rgba(0,0,0,0.5);
+            --bg-base: #030014;
+            --glass-bg: rgba(20, 15, 35, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-1: #8b5cf6;
+            --accent-2: #ec4899;
+            --accent-3: #06b6d4;
+            --font-display: 'Outfit', 'Noto Sans SC', sans-serif;
+            --font-body: 'Noto Sans SC', sans-serif;
         }
 
         * {
@@ -29,1121 +26,711 @@
         }
 
         body {
-            font-family: 'Outfit', 'Noto Sans SC', sans-serif;
-            background-color: var(--bg-primary);
+            font-family: var(--font-body);
+            background-color: var(--bg-base);
             color: var(--text-main);
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(122, 34, 255, 0.18) 0px, transparent 40%),
-                radial-gradient(at 100% 50%, rgba(0, 240, 255, 0.12) 0px, transparent 40%),
-                radial-gradient(at 50% 100%, rgba(255, 0, 127, 0.08) 0px, transparent 40%);
-            background-attachment: fixed;
             line-height: 1.6;
         }
 
+        /* 动态 Canvas 背景 */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -2;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #030014 100%);
+        }
+
+        /* 动态光晕层增加层次感 */
+        .ambient-light {
+            position: fixed;
+            width: 100vw; height: 100vh;
+            top: 0; left: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+        }
+
         /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-purple);
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-1); }
 
         /* Navbar */
         nav {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 1.2rem 4rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 3rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(6, 7, 11, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(3, 0, 20, 0.5);
+            backdrop-filter: blur(20px);
         }
 
         .logo {
-            font-size: 1.6rem;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--text-main), var(--accent-purple), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo span {
-            font-size: 1.2rem;
-            color: var(--accent-cyan);
-        }
-
-        .contact-nav {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .contact-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            border: 1px solid transparent;
-        }
-
-        .contact-link:hover {
-            color: var(--accent-cyan);
-            border-color: rgba(0, 240, 255, 0.2);
-            background: rgba(0, 240, 255, 0.05);
-        }
-
-        /* Hero Section */
-        .hero {
-            max-width: 1400px;
-            margin: 5rem auto;
-            padding: 0 3rem;
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 5rem;
-            align-items: center;
-        }
-
-        .hero-left h1 {
-            font-size: 4rem;
-            font-weight: 800;
-            line-height: 1.15;
-            margin-bottom: 1.5rem;
-            letter-spacing: -1px;
-        }
-
-        .hero-left h1 span {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan), var(--accent-pink));
+            background: linear-gradient(to right, #fff, var(--accent-3));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px rgba(122, 34, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .hero-tagline {
-            font-size: 1.1rem;
-            color: var(--accent-cyan);
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
+        .logo-dot {
+            width: 8px; height: 8px;
+            background: var(--accent-3);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-3);
         }
 
-        .hero-desc {
-            color: var(--text-muted);
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            color: var(--accent-3);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #fff 20%, var(--accent-1) 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 10px 20px rgba(139, 92, 246, 0.2));
+        }
+
+        .hero p {
             font-size: 1.2rem;
-            margin-bottom: 2.5rem;
+            color: var(--text-muted);
             max-width: 650px;
             font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .hero-buttons {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 0.9rem 2.5rem;
-            border-radius: 30px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-            color: white;
-            box-shadow: 0 8px 25px var(--accent-purple-glow);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(122, 34, 255, 0.6);
-        }
-
-        .btn-secondary {
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(5px);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .hero-right {
-            display: flex;
-            justify-content: center;
-            position: relative;
-        }
-
-        /* Premium Floating Avatar Frame */
-        .avatar-glow {
+        /* Scroll Down Indicator */
+        .scroll-down {
             position: absolute;
-            width: 340px;
-            height: 340px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
-            opacity: 0.3;
-            filter: blur(20px);
-            animation: pulse 4s infinite alternate;
-            z-index: 1;
-        }
-
-        .avatar-frame {
-            width: 320px;
-            height: 320px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan), var(--accent-pink));
-            padding: 3px;
-            position: relative;
-            z-index: 2;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .avatar-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: var(--bg-secondary);
-            overflow: hidden;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            font-size: 5rem;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            gap: 10px;
+            opacity: 0.8;
+            animation: bounce 2s infinite;
+        }
+        .scroll-line {
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, var(--accent-3));
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.2; }
-            100% { transform: scale(1.05); opacity: 0.4; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-15px) translateX(-50%); }
+            60% { transform: translateY(-7px) translateX(-50%); }
         }
 
         /* Works Section */
         .works-section {
-            max-width: 1400px;
-            margin: 8rem auto;
-            padding: 0 3rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 6rem 4rem;
         }
 
-        .section-header {
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
             margin-bottom: 4rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+            text-align: center;
+            letter-spacing: 2px;
             position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
         }
-
-        .section-header::before {
+        
+        .section-title::after {
             content: '';
             position: absolute;
             bottom: -15px;
-            left: 0;
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-1);
             border-radius: 2px;
-        }
-
-        .section-header h2 {
-            font-size: 2.6rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .section-header p {
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-            font-size: 1.1rem;
+            box-shadow: 0 0 10px var(--accent-1);
         }
 
         .works-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 2.5rem;
         }
 
-        /* Premium Work Card */
-        .work-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
+        /* Glass Card */
+        .glass-card {
+            background: rgba(20, 15, 35, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-            position: relative;
-            box-shadow: var(--shadow-premium);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
-        .work-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(0, 240, 255, 0.4);
-            box-shadow: 0 20px 40px rgba(0, 240, 255, 0.08), 0 0 25px rgba(122, 34, 255, 0.1);
+        .glass-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.25), 0 0 20px rgba(6, 182, 212, 0.15);
         }
 
         .card-thumb {
             position: relative;
-            height: 190px;
-            background: #000;
+            height: 200px;
             overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .card-thumb img {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.6s ease;
         }
 
-        .work-card:hover .card-thumb img {
+        .glass-card:hover .card-thumb img {
             transform: scale(1.08);
-        }
-
-        .card-hover-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(13, 15, 23, 0.5);
-            backdrop-filter: blur(2px);
-            opacity: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.3s;
-        }
-
-        .work-card:hover .card-hover-overlay {
-            opacity: 1;
-        }
-
-        .play-btn-icon {
-            font-size: 2rem;
-            color: white;
-            background: var(--accent-purple);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 25px var(--accent-purple);
-            transform: scale(0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            padding-left: 4px;
-        }
-
-        .work-card:hover .play-btn-icon {
-            transform: scale(1);
         }
 
         .card-duration {
             position: absolute;
-            bottom: 12px;
-            right: 12px;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            z-index: 3;
-        }
-
-        .card-rank {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-            padding: 0.3rem 0.8rem;
+            bottom: 12px; right: 12px;
+            background: rgba(0,0,0,0.8);
+            padding: 4px 10px;
             border-radius: 8px;
             font-size: 0.75rem;
-            font-weight: 800;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            z-index: 3;
-            letter-spacing: 1px;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .glass-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .play-btn {
+            width: 64px; height: 64px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            transform: scale(0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover .play-btn {
+            transform: scale(1);
+            background: rgba(236, 72, 153, 0.8);
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
         }
 
         .card-body {
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.2rem;
         }
 
         .card-title {
-            font-size: 1.1rem;
+            font-family: var(--font-display);
+            font-size: 1.15rem;
             font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: var(--text-main);
-        }
-
-        /* Premium Visual Metric Progress Bars */
-        .card-metric-bars {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            padding: 0.75rem;
-            border: 1px solid rgba(255,255,255,0.02);
-        }
-
-        .metric-bar-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .bar-label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .bar-track {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .bar-fill {
-            height: 100%;
-            border-radius: 2px;
-        }
-
-        .bar-fill.sharp {
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
-        }
-
-        .bar-fill.color {
-            background: linear-gradient(90deg, var(--accent-cyan), #00ff87);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
         .card-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.85rem; color: var(--text-muted);
         }
 
-        .card-score {
-            color: var(--accent-cyan);
+        .score-badge {
+            padding: 4px 10px;
+            background: rgba(139, 92, 246, 0.15);
+            color: #d8b4fe;
+            border-radius: 6px;
             font-weight: 700;
+            font-size: 0.75rem;
+            border: 1px solid rgba(139, 92, 246, 0.4);
         }
 
         .card-tags {
-            display: flex;
-            gap: 0.4rem;
-            flex-wrap: wrap;
+            display: flex; gap: 0.5rem; flex-wrap: wrap;
         }
-
         .tag {
-            background: rgba(122, 34, 255, 0.08);
-            color: #b580ff;
-            border: 1px solid rgba(122, 34, 255, 0.2);
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 6px;
-            font-weight: 600;
+            font-size: 0.7rem; padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: var(--text-muted);
         }
 
-        /* Premium Video Modal Player */
-        .player-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(3, 4, 7, 0.93);
+        /* Modal Player */
+        .modal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(15px);
             z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease;
         }
-
-        .player-modal.active {
-            display: flex;
-            opacity: 1;
+        .modal.active {
+            opacity: 1; pointer-events: all;
         }
-
         .modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
+            width: 90%; max-width: 1200px;
+            background: rgba(15, 10, 25, 0.8);
             border-radius: 24px;
-            width: 90%;
-            max-width: 1100px;
             overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-            position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255,255,255,0.1);
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: grid;
-            grid-template-columns: 2.3fr 1fr;
+            grid-template-columns: 2.5fr 1fr;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.8);
         }
-
-        .player-modal.active .modal-content {
-            transform: scale(1);
+        .modal.active .modal-content {
+            transform: translateY(0) scale(1);
         }
-
-        .modal-left {
+        .modal-video {
             background: #000;
             aspect-ratio: 16/9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-video-container {
             width: 100%;
-            height: 100%;
         }
-
-        .modal-video-container video {
-            width: 100%;
-            height: 100%;
-            display: block;
+        .modal-video video {
+            width: 100%; height: 100%; object-fit: contain;
         }
-
-        .modal-right {
-            padding: 2.5rem 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border-left: 1px solid var(--border-color);
+        .modal-info {
+            padding: 2.5rem;
+            display: flex; flex-direction: column; gap: 1.5rem;
+            background: rgba(20, 15, 35, 0.6);
+            border-left: 1px solid rgba(255,255,255,0.05);
         }
-
-        .modal-detail-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
         .modal-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            line-height: 1.3;
+            font-family: var(--font-display);
+            font-size: 1.25rem; font-weight: 700;
+            line-height: 1.4;
         }
-
-        .modal-specs {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            background: rgba(255,255,255,0.02);
-            padding: 1rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .spec-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-        }
-
-        .spec-label {
-            color: var(--text-muted);
-        }
-
-        .spec-value {
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
         .modal-close {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            font-size: 1.5rem;
-            width: 44px;
-            height: 44px;
+            position: absolute; top: 20px; right: 20px;
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
+            color: white; font-size: 24px;
+            cursor: pointer; z-index: 10;
+            backdrop-filter: blur(10px);
             transition: all 0.3s;
         }
-
         .modal-close:hover {
-            background: var(--accent-pink);
+            background: var(--accent-2); transform: rotate(90deg);
             border-color: transparent;
-            transform: rotate(90deg);
-        }
-
-        /* Footer / Contact */
-        footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            padding: 6rem 3rem 4rem 3rem;
-            text-align: center;
-            position: relative;
-        }
-
-        .footer-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .footer-title {
-            font-size: 2.4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--text-main), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .qr-frame {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            padding: 3px;
-            border-radius: 16px;
-            margin: 1rem 0;
-            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
-        }
-
-        .qr-placeholder {
-            width: 160px;
-            height: 160px;
-            background: #fff;
-            border-radius: 13px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-        }
-
-        .qr-placeholder span {
-            color: #000;
-            font-weight: 800;
-            font-size: 0.9rem;
-        }
-
-        .contact-info-list {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .contact-item {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            padding: 0.8rem 1.5rem;
-            border-radius: 30px;
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .contact-item span {
-            color: var(--accent-cyan);
-            margin-right: 0.5rem;
-        }
-
-        .footer-meta {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 3rem;
-            border-top: 1px solid var(--border-color);
-            padding-top: 2rem;
-            width: 100%;
         }
         
-        /* Responsive adjustments */
-        @media (max-width: 900px) {
-            .hero {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 3rem;
-                margin: 3rem auto;
-            }
-            .hero-left h1 {
-                font-size: 3rem;
-            }
-            .hero-desc {
-                margin: 0 auto 2rem auto;
-            }
-            .hero-buttons {
-                justify-content: center;
-            }
-            .modal-content {
-                grid-template-columns: 1fr;
-            }
-            .modal-right {
-                border-left: none;
-                border-top: 1px solid var(--border-color);
-                padding: 1.5rem;
-            }
+        .spec-item {
+            display: flex; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+        .spec-label { color: var(--text-muted); }
+        .spec-value { font-weight: 600; }
+
+        footer {
+            text-align: center; padding: 4rem 2rem;
+            color: var(--text-muted); font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (max-width: 1024px) {
+            .modal-content { grid-template-columns: 1fr; }
+            .modal-info { padding: 1.5rem; border-left: none; border-top: 1px solid rgba(255,255,255,0.05); }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+    <canvas id="bg-canvas"></canvas>
+    <div class="ambient-light"></div>
+
     <nav>
-        <div class="logo"><span>✨</span> 彼岸之风</div>
-        <div class="contact-nav">
-            <a href="#works" class="contact-link">作品精选</a>
-            <a href="#contact" class="contact-link">联络合作</a>
-        </div>
+        <div class="logo"><div class="logo-dot"></div> VISIONARY 创想</div>
     </nav>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-left">
-            <div class="hero-tagline">Video Artist & Post Production</div>
-            <h1>我是 <span>彼岸之风</span></h1>
-            <p class="hero-desc">
-                专注高质量视频剪辑、电影级调色与后期特效创作。用镜头结构故事，用色彩渲染情绪。这是我为您精选的作品集，集结了最出彩的视觉创作案例。
-            </p>
-            <div class="hero-buttons">
-                <a href="#works" class="btn btn-primary">进入作品集</a>
-                <a href="#contact" class="btn btn-secondary">立即联络</a>
-            </div>
-        </div>
-        <div class="hero-right">
-            <div class="avatar-glow"></div>
-            <div class="avatar-frame">
-                <div class="avatar-inner">
-                    🌌
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Works Grid -->
-    <section class="works-section" id="works">
-        <div class="section-header">
-            <div>
-                <h2>核心成片案例</h2>
-                <p>经由 AI 智能评估筛选的 Top 10 最佳视觉成片</p>
-            </div>
-        </div>
+    <header class="hero">
+        <div class="hero-badge">精选作品集展览</div>
+        <h1>视觉艺术工作室</h1>
+        <p>结合 AI 美学分析的流媒体与视觉特效设计作品展示。探索每一个镜头背后蕴含的无限创造力。</p>
         
+        <div class="scroll-down">
+            <span style="font-size: 0.8rem; letter-spacing: 2px;">探索更多</span>
+            <div class="scroll-line"></div>
+        </div>
+    </header>
+
+    <section class="works-section">
+        <h2 class="section-title">精选作品 GALLERY</h2>
         <div class="works-grid">
             
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215000_859.mp4', '微信视频2026-06-26_215000_859.mp4', '26.7秒', '1080x1920', '87.3', 43, 83, 84)">
+            <div class="glass-card work-card" onclick="openPlayer('videos/1.mp4', '作品 1', '15.0秒', '1280x720', '93.1')">
                 <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_215000_859_thumb_1.jpg" alt="微信视频2026-06-26_215000_859.mp4" loading="lazy">
-                    <span class="card-duration">26.7s</span>
-                    <span class="card-rank">TOP 1</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
+                    <img src="thumbnails/1_thumb.jpg" alt="作品 1" loading="lazy">
+                    <span class="card-duration">15.0s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_215000_859.mp4">微信视频2026-06-26_215000_859.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 43%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 83%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="card-title" title="作品 1">作品 1</h3>
                     
                     <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 87.3</span>
+                        <span>1280x720</span>
+                        <div class="score-badge">评分 93.1</div>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220209_084.mp4', '微信视频2026-06-26_220209_084.mp4', '15.1秒', '1080x1920', '87.0', 45, 81, 80)">
+            <div class="glass-card work-card" onclick="openPlayer('videos/2.mp4', '作品 2', '30.1秒', '720x1280', '92.3')">
                 <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_220209_084_thumb_1.jpg" alt="微信视频2026-06-26_220209_084.mp4" loading="lazy">
+                    <img src="thumbnails/2_thumb.jpg" alt="作品 2" loading="lazy">
+                    <span class="card-duration">30.1s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 2">作品 2</h3>
+                    
+                    <div class="card-meta">
+                        <span>720x1280</span>
+                        <div class="score-badge">评分 92.3</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/3.mp4', '作品 3', '15.1秒', '1080x1920', '92.8')">
+                <div class="card-thumb">
+                    <img src="thumbnails/3_thumb.jpg" alt="作品 3" loading="lazy">
                     <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 2</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_220209_084.mp4">微信视频2026-06-26_220209_084.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 45%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 81%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="card-title" title="作品 3">作品 3</h3>
                     
                     <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 87.0</span>
+                        <span>1080x1920</span>
+                        <div class="score-badge">评分 92.8</div>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215806_427.mp4', '微信视频2026-06-26_215806_427.mp4', '15.1秒', '1080x1920', '86.1', 34, 68, 90)">
+            <div class="glass-card work-card" onclick="openPlayer('videos/4.mp4', '作品 4', '30.2秒', '1080x1920', '91.8')">
                 <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_215806_427_thumb_1.jpg" alt="微信视频2026-06-26_215806_427.mp4" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 3</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_215806_427.mp4">微信视频2026-06-26_215806_427.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 34%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 68%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 86.1</span>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220851_987.mp4', '微信视频2026-06-26_220851_987.mp4', '15.1秒', '1080x1920', '84.8', 34, 73, 73)">
-                <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_220851_987_thumb_1.jpg" alt="微信视频2026-06-26_220851_987.mp4" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 4</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_220851_987.mp4">微信视频2026-06-26_220851_987.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 34%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 73%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 84.8</span>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_221243_803.mp4', '微信视频2026-06-26_221243_803.mp4', '15.1秒', '1080x1920', '84.3', 50, 60, 77)">
-                <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_221243_803_thumb_1.jpg" alt="微信视频2026-06-26_221243_803.mp4" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 5</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_221243_803.mp4">微信视频2026-06-26_221243_803.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 50%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 60%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 84.3</span>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_221328_068.mp4', '微信视频2026-06-26_221328_068.mp4', '15.1秒', '1080x1920', '83.8', 57, 62, 67)">
-                <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_221328_068_thumb_1.jpg" alt="微信视频2026-06-26_221328_068.mp4" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 6</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_221328_068.mp4">微信视频2026-06-26_221328_068.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 57%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 62%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 83.8</span>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220934_514.mp4', '微信视频2026-06-26_220934_514.mp4', '15.1秒', '1080x1920', '83.1', 35, 56, 77)">
-                <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_220934_514_thumb_1.jpg" alt="微信视频2026-06-26_220934_514.mp4" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 7</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_220934_514.mp4">微信视频2026-06-26_220934_514.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 35%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 56%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 83.1</span>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220055_274.mp4', '微信视频2026-06-26_220055_274.mp4', '30.3秒', '1080x1920', '82.5', 27, 60, 89)">
-                <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_220055_274_thumb_1.jpg" alt="微信视频2026-06-26_220055_274.mp4" loading="lazy">
-                    <span class="card-duration">30.3s</span>
-                    <span class="card-rank">TOP 8</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_220055_274.mp4">微信视频2026-06-26_220055_274.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 27%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 60%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 82.5</span>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_220133_754.mp4', '微信视频2026-06-26_220133_754.mp4', '30.2秒', '1080x1920', '81.2', 64, 47, 75)">
-                <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_220133_754_thumb_1.jpg" alt="微信视频2026-06-26_220133_754.mp4" loading="lazy">
+                    <img src="thumbnails/4_thumb.jpg" alt="作品 4" loading="lazy">
                     <span class="card-duration">30.2s</span>
-                    <span class="card-rank">TOP 9</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_220133_754.mp4">微信视频2026-06-26_220133_754.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 64%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 47%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="card-title" title="作品 4">作品 4</h3>
                     
                     <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 81.2</span>
+                        <span>1080x1920</span>
+                        <div class="score-badge">评分 91.8</div>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
                     </div>
                 </div>
             </div>
         
-            <div class="work-card" onclick="openPlayer('videos/微信视频2026-06-26_215143_660.mp4', '微信视频2026-06-26_215143_660.mp4', '15.1秒', '1080x1920', '81.0', 15, 54, 70)">
+            <div class="glass-card work-card" onclick="openPlayer('videos/5.mp4', '作品 5', '30.3秒', '1080x1920', '93.5')">
                 <div class="card-thumb">
-                    <img src="thumbnails/微信视频2026-06-26_215143_660_thumb_1.jpg" alt="微信视频2026-06-26_215143_660.mp4" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <span class="card-rank">TOP 10</span>
-                    <div class="card-hover-overlay">
-                        <span class="play-btn-icon">▶</span>
+                    <img src="thumbnails/5_thumb.jpg" alt="作品 5" loading="lazy">
+                    <span class="card-duration">30.3s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title" title="微信视频2026-06-26_215143_660.mp4">微信视频2026-06-26_215143_660.mp4</h3>
-                    
-                    <!-- Premium metric bars -->
-                    <div class="card-metric-bars">
-                        <div class="metric-bar-item">
-                            <span class="bar-label">画面清晰度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill sharp" style="width: 15%"></div>
-                            </div>
-                        </div>
-                        <div class="metric-bar-item">
-                            <span class="bar-label">色彩丰富度</span>
-                            <div class="bar-track">
-                                <div class="bar-fill color" style="width: 54%"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="card-title" title="作品 5">作品 5</h3>
                     
                     <div class="card-meta">
-                        <span>尺寸: 1080x1920</span>
-                        <span class="card-score">评分: 81.0</span>
+                        <span>1080x1920</span>
+                        <div class="score-badge">评分 93.5</div>
                     </div>
                     <div class="card-tags">
-                        <span class="tag">1080P HD</span><span class="tag">有声成片</span>
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/6.mp4', '作品 6', '30.2秒', '1080x1920', '94.2')">
+                <div class="card-thumb">
+                    <img src="thumbnails/6_thumb.jpg" alt="作品 6" loading="lazy">
+                    <span class="card-duration">30.2s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 6">作品 6</h3>
+                    
+                    <div class="card-meta">
+                        <span>1080x1920</span>
+                        <div class="score-badge">评分 94.2</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/7.mp4', '作品 7', '15.1秒', '1080x1920', '92.4')">
+                <div class="card-thumb">
+                    <img src="thumbnails/7_thumb.jpg" alt="作品 7" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 7">作品 7</h3>
+                    
+                    <div class="card-meta">
+                        <span>1080x1920</span>
+                        <div class="score-badge">评分 92.4</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/8.mp4', '作品 8', '15.1秒', '1080x1920', '94.5')">
+                <div class="card-thumb">
+                    <img src="thumbnails/8_thumb.jpg" alt="作品 8" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 8">作品 8</h3>
+                    
+                    <div class="card-meta">
+                        <span>1080x1920</span>
+                        <div class="score-badge">评分 94.5</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/9.mp4', '作品 9', '15.1秒', '1080x1920', '96.6')">
+                <div class="card-thumb">
+                    <img src="thumbnails/9_thumb.jpg" alt="作品 9" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 9">作品 9</h3>
+                    
+                    <div class="card-meta">
+                        <span>1080x1920</span>
+                        <div class="score-badge">评分 96.6</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/10.mp4', '作品 10', '15.1秒', '720x1280', '93.7')">
+                <div class="card-thumb">
+                    <img src="thumbnails/10_thumb.jpg" alt="作品 10" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 10">作品 10</h3>
+                    
+                    <div class="card-meta">
+                        <span>720x1280</span>
+                        <div class="score-badge">评分 93.7</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/11.mp4', '作品 11', '15.1秒', '1280x720', '91.4')">
+                <div class="card-thumb">
+                    <img src="thumbnails/11_thumb.jpg" alt="作品 11" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 11">作品 11</h3>
+                    
+                    <div class="card-meta">
+                        <span>1280x720</span>
+                        <div class="score-badge">评分 91.4</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/12.mp4', '作品 12', '15.0秒', '720x1280', '92.5')">
+                <div class="card-thumb">
+                    <img src="thumbnails/12_thumb.jpg" alt="作品 12" loading="lazy">
+                    <span class="card-duration">15.0s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 12">作品 12</h3>
+                    
+                    <div class="card-meta">
+                        <span>720x1280</span>
+                        <div class="score-badge">评分 92.5</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">有声</span>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="glass-card work-card" onclick="openPlayer('videos/13.mp4', '作品 13', '15.1秒', '1080x1920', '97.0')">
+                <div class="card-thumb">
+                    <img src="thumbnails/13_thumb.jpg" alt="作品 13" loading="lazy">
+                    <span class="card-duration">15.1s</span>
+                    <div class="play-overlay">
+                        <div class="play-btn">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title" title="作品 13">作品 13</h3>
+                    
+                    <div class="card-meta">
+                        <span>1080x1920</span>
+                        <div class="score-badge">评分 97.0</div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
                     </div>
                 </div>
             </div>
@@ -1151,82 +738,49 @@
         </div>
     </section>
 
-    <!-- Contact Footer -->
-    <footer id="contact">
-        <div class="footer-content">
-            <div class="footer-title">与我联合创作</div>
-            <p style="color: var(--text-muted); max-width: 550px; font-size: 1.05rem;">
-                对我的镜头节奏或色彩风格感兴趣？欢迎扫码加微信，或通过以下方式取得联系。期待我们的下一次深度合作！
-            </p>
-            
-            <div class="qr-frame">
-                <div class="qr-placeholder">
-                    <span>[ 微信二维码 ]</span>
-                </div>
-            </div>
-            
-            <div class="contact-info-list">
-                <div class="contact-item"><span>微信:</span> YourWeChatId</div>
-                <div class="contact-item"><span>电话:</span> YourPhoneNumber</div>
-            </div>
-            
-            <div class="footer-meta">
-                &copy; 2026 彼岸之风. All rights reserved. Created with AI Visual Algorithm.
-            </div>
-        </div>
-    </footer>
-
-    <!-- Video Modal Player -->
-    <div class="player-modal" id="player-modal">
+    <div class="modal" id="playerModal">
         <button class="modal-close" onclick="closePlayer()">&times;</button>
         <div class="modal-content">
-            <div class="modal-left">
-                <div class="modal-video-container">
-                    <video id="modal-video" controls></video>
-                </div>
+            <div class="modal-video">
+                <video id="mainVideo" controls autoplay></video>
             </div>
-            <div class="modal-right">
-                <div class="modal-detail-info">
-                    <h3 id="modal-title" class="modal-title">作品名称</h3>
-                    <div class="modal-specs">
-                        <div class="spec-row">
-                            <span class="spec-label">视频时长</span>
-                            <span id="spec-duration" class="spec-value">-</span>
-                        </div>
-                        <div class="spec-row">
-                            <span class="spec-label">原始尺寸</span>
-                            <span id="spec-resolution" class="spec-value">-</span>
-                        </div>
-                        <div class="spec-row">
-                            <span class="spec-label">面试评分</span>
-                            <span id="spec-score" class="spec-value" style="color: var(--accent-cyan);">-</span>
-                        </div>
+            <div class="modal-info">
+                <h3 class="modal-title" id="mTitle">视频标题</h3>
+                
+                <div style="margin-top: 1rem;">
+                    <div class="spec-item">
+                        <span class="spec-label">时长</span>
+                        <span class="spec-value" id="mDuration">-</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">分辨率</span>
+                        <span class="spec-value" id="mRes">-</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">综合得分</span>
+                        <span class="spec-value" id="mScore" style="color: var(--accent-3);">-</span>
                     </div>
                 </div>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">
-                    * 视频文件已做 Web 端流式优化，以极低带宽保障高清播放体验。
-                </p>
             </div>
         </div>
     </div>
 
-    <script>
-        const modal = document.getElementById('player-modal');
-        const video = document.getElementById('modal-video');
-        const titleEl = document.getElementById('modal-title');
-        const specDuration = document.getElementById('spec-duration');
-        const specResolution = document.getElementById('spec-resolution');
-        const specScore = document.getElementById('spec-score');
+    <footer>
+        &copy; 2026 Visionary 视觉艺术工作室. All Rights Reserved.
+    </footer>
 
-        function openPlayer(videoUrl, title, duration, resolution, score, sharp, color, contrast) {
-            titleEl.textContent = title;
-            specDuration.textContent = duration;
-            specResolution.textContent = resolution;
-            specScore.textContent = score + " 分";
-            
-            video.src = videoUrl;
+    <script>
+        // 模态框逻辑
+        const modal = document.getElementById('playerModal');
+        const video = document.getElementById('mainVideo');
+        
+        function openPlayer(src, title, duration, res, score) {
+            video.src = src;
+            document.getElementById('mTitle').textContent = title;
+            document.getElementById('mDuration').textContent = duration;
+            document.getElementById('mRes').textContent = res;
+            document.getElementById('mScore').textContent = score;
             modal.classList.add('active');
-            video.play();
         }
 
         function closePlayer() {
@@ -1235,12 +789,111 @@
             video.src = '';
         }
 
-        // Close on clicking outside modal content
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closePlayer();
-            }
+            if (e.target === modal) closePlayer();
         });
+
+        // 高颜值交互式粒子背景动画 Canvas
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        function initCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            
+            // 响应屏幕尺寸调整粒子数量
+            const particleCount = Math.floor(width * height / 15000);
+            particles = [];
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: (Math.random() - 0.5) * 0.8,
+                    radius: Math.random() * 2 + 1,
+                    color: Math.random() > 0.5 ? 'rgba(6, 182, 212, 0.6)' : 'rgba(139, 92, 246, 0.6)'
+                });
+            }
+        }
+
+        window.addEventListener('resize', initCanvas);
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+        window.addEventListener('mouseleave', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        initCanvas();
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // 更新和绘制粒子
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // 边界反弹
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+                
+                // 粒子连线
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx = p.x - p2.x;
+                    let dy = p.y - p2.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 * (1 - dist / 120)})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+                    }
+                }
+                
+                // 鼠标交互连线
+                if (mouse.x != null) {
+                    let dx = p.x - mouse.x;
+                    let dy = p.y - mouse.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 180) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.3 * (1 - dist / 180)})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        
+                        // 鼠标排斥力
+                        if (dist < 80) {
+                            p.x += dx * 0.01;
+                            p.y += dy * 0.01;
+                        }
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
     </script>
 </body>
 </html>
