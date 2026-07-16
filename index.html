@@ -1,899 +1,137 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visionary 创想 | 视觉艺术作品集</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-base: #030014;
-            --glass-bg: rgba(20, 15, 35, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-1: #8b5cf6;
-            --accent-2: #ec4899;
-            --accent-3: #06b6d4;
-            --font-display: 'Outfit', 'Noto Sans SC', sans-serif;
-            --font-body: 'Noto Sans SC', sans-serif;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: var(--font-body);
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* 动态 Canvas 背景 */
-        #bg-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: -2;
-            background: radial-gradient(circle at center, #1a0b2e 0%, #030014 100%);
-        }
-
-        /* 动态光晕层增加层次感 */
-        .ambient-light {
-            position: fixed;
-            width: 100vw; height: 100vh;
-            top: 0; left: 0;
-            z-index: -1;
-            pointer-events: none;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-1); }
-
-        /* Navbar */
-        nav {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            padding: 1.2rem 4rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(3, 0, 20, 0.5);
-            backdrop-filter: blur(20px);
-        }
-
-        .logo {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            background: linear-gradient(to right, #fff, var(--accent-3));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-dot {
-            width: 8px; height: 8px;
-            background: var(--accent-3);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-3);
-        }
-
-        /* Hero */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 2rem;
-            position: relative;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.9rem;
-            font-weight: 500;
-            letter-spacing: 2px;
-            margin-bottom: 1.5rem;
-            color: var(--accent-3);
-            backdrop-filter: blur(10px);
-        }
-
-        .hero h1 {
-            font-family: var(--font-display);
-            font-size: clamp(2.5rem, 6vw, 5rem);
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 1.5rem;
-            letter-spacing: 1px;
-            background: linear-gradient(135deg, #fff 20%, var(--accent-1) 80%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 10px 20px rgba(139, 92, 246, 0.2));
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            max-width: 650px;
-            font-weight: 300;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        /* Scroll Down Indicator */
-        .scroll-down {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            opacity: 0.8;
-            animation: bounce 2s infinite;
-        }
-        .scroll-line {
-            width: 2px;
-            height: 40px;
-            background: linear-gradient(to bottom, transparent, var(--accent-3));
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
-            40% { transform: translateY(-15px) translateX(-50%); }
-            60% { transform: translateY(-7px) translateX(-50%); }
-        }
-
-        /* Works Section */
-        .works-section {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 6rem 4rem;
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 4rem;
-            text-align: center;
-            letter-spacing: 2px;
-            position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: var(--accent-1);
-            border-radius: 2px;
-            box-shadow: 0 0 10px var(--accent-1);
-        }
-
-        .works-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2.5rem;
-        }
-
-        /* Glass Card */
-        .glass-card {
-            background: rgba(20, 15, 35, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
-
-        .glass-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.25), 0 0 20px rgba(6, 182, 212, 0.15);
-        }
-
-        .card-thumb {
-            position: relative;
-            height: 200px;
-            overflow: hidden;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .card-thumb img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s ease;
-        }
-
-        .glass-card:hover .card-thumb img {
-            transform: scale(1.08);
-        }
-
-        .card-duration {
-            position: absolute;
-            bottom: 12px; right: 12px;
-            background: rgba(0,0,0,0.8);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .play-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .glass-card:hover .play-overlay {
-            opacity: 1;
-        }
-
-        .play-btn {
-            width: 64px; height: 64px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.25);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            transform: scale(0.8);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .glass-card:hover .play-btn {
-            transform: scale(1);
-            background: rgba(236, 72, 153, 0.8);
-            border-color: transparent;
-            box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
-        }
-
-        .card-body {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        .card-title {
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 700;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-
-        .card-meta {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 0.85rem; color: var(--text-muted);
-        }
-
-        .score-badge {
-            padding: 4px 10px;
-            background: rgba(139, 92, 246, 0.15);
-            color: #d8b4fe;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            border: 1px solid rgba(139, 92, 246, 0.4);
-        }
-
-        .card-tags {
-            display: flex; gap: 0.5rem; flex-wrap: wrap;
-        }
-        .tag {
-            font-size: 0.7rem; padding: 2px 8px;
-            border-radius: 4px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: var(--text-muted);
-        }
-
-        /* Modal Player */
-        .modal {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(15px);
-            z-index: 1000;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.4s ease;
-        }
-        .modal.active {
-            opacity: 1; pointer-events: all;
-        }
-        .modal-content {
-            width: 90%; max-width: 1200px;
-            background: rgba(15, 10, 25, 0.8);
-            border-radius: 24px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-            transform: translateY(20px) scale(0.95);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: grid;
-            grid-template-columns: 2.5fr 1fr;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.8);
-        }
-        .modal.active .modal-content {
-            transform: translateY(0) scale(1);
-        }
-        .modal-video {
-            background: #000;
-            aspect-ratio: 16/9;
-            width: 100%;
-        }
-        .modal-video video {
-            width: 100%; height: 100%; object-fit: contain;
-        }
-        .modal-info {
-            padding: 2.5rem;
-            display: flex; flex-direction: column; gap: 1.5rem;
-            background: rgba(20, 15, 35, 0.6);
-            border-left: 1px solid rgba(255,255,255,0.05);
-        }
-        .modal-title {
-            font-family: var(--font-display);
-            font-size: 1.25rem; font-weight: 700;
-            line-height: 1.4;
-        }
-        .modal-close {
-            position: absolute; top: 20px; right: 20px;
-            width: 48px; height: 48px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            color: white; font-size: 24px;
-            cursor: pointer; z-index: 10;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
-        }
-        .modal-close:hover {
-            background: var(--accent-2); transform: rotate(90deg);
-            border-color: transparent;
-        }
-        
-        .spec-item {
-            display: flex; justify-content: space-between;
-            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.9rem;
-        }
-        .spec-label { color: var(--text-muted); }
-        .spec-value { font-weight: 600; }
-
-        footer {
-            text-align: center; padding: 4rem 2rem;
-            color: var(--text-muted); font-size: 0.85rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            background: rgba(0,0,0,0.5);
-            position: relative;
-            z-index: 10;
-        }
-
-        @media (max-width: 1024px) {
-            .modal-content { grid-template-columns: 1fr; }
-            .modal-info { padding: 1.5rem; border-left: none; border-top: 1px solid rgba(255,255,255,0.05); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050507">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="沉浸式动态视频作品展厅，精选横屏与竖屏影像作品。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Motion Gallery | Selected Works">
+  <meta property="og:description" content="A curated collection of moving images and visual experiments.">
+  <meta property="og:image" content="thumbnails/1_thumb.jpg">
+  <link rel="canonical" href="https://no9u93nuong2445-spec.github.io/my-video-portfolio/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="thumbnails/1_thumb.jpg" as="image" fetchpriority="high">
+  <link rel="stylesheet" href="assets/styles.css">
+  <title>Motion Gallery | Selected Works</title>
 </head>
 <body>
-    <canvas id="bg-canvas"></canvas>
-    <div class="ambient-light"></div>
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <span class="preloader__mark">M</span>
+    <span class="preloader__line"></span>
+  </div>
 
-    <nav>
-        <div class="logo"><div class="logo-dot"></div> VISIONARY 创想</div>
-    </nav>
+  <canvas id="atmosphere" class="atmosphere" aria-hidden="true"></canvas>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
-    <header class="hero">
-        <div class="hero-badge">精选作品集展览</div>
-        <h1>视觉艺术工作室</h1>
-        <p>结合 AI 美学分析的流媒体与视觉特效设计作品展示。探索每一个镜头背后蕴含的无限创造力。</p>
-        
-        <div class="scroll-down">
-            <span style="font-size: 0.8rem; letter-spacing: 2px;">探索更多</span>
-            <div class="scroll-line"></div>
-        </div>
-    </header>
+  <header class="site-header" id="siteHeader">
+    <a class="wordmark" href="#top" aria-label="返回页面顶部">
+      <span class="wordmark__dot"></span>
+      <span>MOTION GALLERY</span>
+    </a>
+    <div class="header-meta">
+      <span id="headerCount">13 FILMS</span>
+      <span class="header-meta__divider"></span>
+      <span>SELECTED WORKS</span>
+    </div>
+  </header>
 
-    <section class="works-section">
-        <h2 class="section-title">精选作品 GALLERY</h2>
-        <div class="works-grid">
-            
-            <div class="glass-card work-card" onclick="openPlayer('videos/1.mp4', '作品 1', '15.0秒', '1280x720', '93.1')">
-                <div class="card-thumb">
-                    <img src="thumbnails/1_thumb.jpg" alt="作品 1" loading="lazy">
-                    <span class="card-duration">15.0s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 1">作品 1</h3>
-                    
-                    <div class="card-meta">
-                        <span>1280x720</span>
-                        <div class="score-badge">评分 93.1</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/2.mp4', '作品 2', '30.1秒', '720x1280', '92.3')">
-                <div class="card-thumb">
-                    <img src="thumbnails/2_thumb.jpg" alt="作品 2" loading="lazy">
-                    <span class="card-duration">30.1s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 2">作品 2</h3>
-                    
-                    <div class="card-meta">
-                        <span>720x1280</span>
-                        <div class="score-badge">评分 92.3</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/3.mp4', '作品 3', '15.1秒', '1080x1920', '92.8')">
-                <div class="card-thumb">
-                    <img src="thumbnails/3_thumb.jpg" alt="作品 3" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 3">作品 3</h3>
-                    
-                    <div class="card-meta">
-                        <span>1080x1920</span>
-                        <div class="score-badge">评分 92.8</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/4.mp4', '作品 4', '30.2秒', '1080x1920', '91.8')">
-                <div class="card-thumb">
-                    <img src="thumbnails/4_thumb.jpg" alt="作品 4" loading="lazy">
-                    <span class="card-duration">30.2s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 4">作品 4</h3>
-                    
-                    <div class="card-meta">
-                        <span>1080x1920</span>
-                        <div class="score-badge">评分 91.8</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/5.mp4', '作品 5', '30.3秒', '1080x1920', '93.5')">
-                <div class="card-thumb">
-                    <img src="thumbnails/5_thumb.jpg" alt="作品 5" loading="lazy">
-                    <span class="card-duration">30.3s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 5">作品 5</h3>
-                    
-                    <div class="card-meta">
-                        <span>1080x1920</span>
-                        <div class="score-badge">评分 93.5</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/6.mp4', '作品 6', '30.2秒', '1080x1920', '94.2')">
-                <div class="card-thumb">
-                    <img src="thumbnails/6_thumb.jpg" alt="作品 6" loading="lazy">
-                    <span class="card-duration">30.2s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 6">作品 6</h3>
-                    
-                    <div class="card-meta">
-                        <span>1080x1920</span>
-                        <div class="score-badge">评分 94.2</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/7.mp4', '作品 7', '15.1秒', '1080x1920', '92.4')">
-                <div class="card-thumb">
-                    <img src="thumbnails/7_thumb.jpg" alt="作品 7" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 7">作品 7</h3>
-                    
-                    <div class="card-meta">
-                        <span>1080x1920</span>
-                        <div class="score-badge">评分 92.4</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/8.mp4', '作品 8', '15.1秒', '1080x1920', '94.5')">
-                <div class="card-thumb">
-                    <img src="thumbnails/8_thumb.jpg" alt="作品 8" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 8">作品 8</h3>
-                    
-                    <div class="card-meta">
-                        <span>1080x1920</span>
-                        <div class="score-badge">评分 94.5</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/9.mp4', '作品 9', '15.1秒', '1080x1920', '96.6')">
-                <div class="card-thumb">
-                    <img src="thumbnails/9_thumb.jpg" alt="作品 9" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 9">作品 9</h3>
-                    
-                    <div class="card-meta">
-                        <span>1080x1920</span>
-                        <div class="score-badge">评分 96.6</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/10.mp4', '作品 10', '15.1秒', '720x1280', '93.7')">
-                <div class="card-thumb">
-                    <img src="thumbnails/10_thumb.jpg" alt="作品 10" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 10">作品 10</h3>
-                    
-                    <div class="card-meta">
-                        <span>720x1280</span>
-                        <div class="score-badge">评分 93.7</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/11.mp4', '作品 11', '15.1秒', '1280x720', '91.4')">
-                <div class="card-thumb">
-                    <img src="thumbnails/11_thumb.jpg" alt="作品 11" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 11">作品 11</h3>
-                    
-                    <div class="card-meta">
-                        <span>1280x720</span>
-                        <div class="score-badge">评分 91.4</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/12.mp4', '作品 12', '15.0秒', '720x1280', '92.5')">
-                <div class="card-thumb">
-                    <img src="thumbnails/12_thumb.jpg" alt="作品 12" loading="lazy">
-                    <span class="card-duration">15.0s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 12">作品 12</h3>
-                    
-                    <div class="card-meta">
-                        <span>720x1280</span>
-                        <div class="score-badge">评分 92.5</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="glass-card work-card" onclick="openPlayer('videos/13.mp4', '作品 13', '15.1秒', '1080x1920', '97.0')">
-                <div class="card-thumb">
-                    <img src="thumbnails/13_thumb.jpg" alt="作品 13" loading="lazy">
-                    <span class="card-duration">15.1s</span>
-                    <div class="play-overlay">
-                        <div class="play-btn">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title" title="作品 13">作品 13</h3>
-                    
-                    <div class="card-meta">
-                        <span>1080x1920</span>
-                        <div class="score-badge">评分 97.0</div>
-                    </div>
-                    <div class="card-tags">
-                        <span class="tag">1080P 高清</span><span class="tag">有声</span>
-                    </div>
-                </div>
-            </div>
-        
-        </div>
+  <main id="top">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero__copy">
+        <p class="eyebrow reveal">CURATED MOVING IMAGES · 2026</p>
+        <h1 id="heroTitle" class="hero__title" aria-label="Selected Motion Works">
+          <span class="hero__line reveal">SELECTED</span>
+          <span class="hero__line hero__line--accent reveal">MOTION WORKS</span>
+        </h1>
+        <p class="hero__description reveal">A curated collection of visual experiments, cinematic frames and moving images.</p>
+      </div>
+
+      <div class="hero-reel" aria-hidden="true">
+        <figure class="reel-frame reel-frame--one" data-depth="0.45">
+          <img src="thumbnails/1_thumb.jpg" alt="" fetchpriority="high">
+        </figure>
+        <figure class="reel-frame reel-frame--two" data-depth="0.75">
+          <img src="thumbnails/5_thumb.jpg" alt="" loading="eager">
+        </figure>
+        <figure class="reel-frame reel-frame--three" data-depth="0.58">
+          <img src="thumbnails/13_thumb.jpg" alt="" loading="eager">
+        </figure>
+        <div class="reel-orbit"></div>
+      </div>
+
+      <a class="scroll-cue" href="#works" aria-label="向下浏览作品">
+        <span>EXPLORE</span>
+        <i></i>
+      </a>
     </section>
 
-    <div class="modal" id="playerModal">
-        <button class="modal-close" onclick="closePlayer()">&times;</button>
-        <div class="modal-content">
-            <div class="modal-video">
-                <video id="mainVideo" controls autoplay></video>
-            </div>
-            <div class="modal-info">
-                <h3 class="modal-title" id="mTitle">视频标题</h3>
-                
-                <div style="margin-top: 1rem;">
-                    <div class="spec-item">
-                        <span class="spec-label">时长</span>
-                        <span class="spec-value" id="mDuration">-</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">分辨率</span>
-                        <span class="spec-value" id="mRes">-</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">综合得分</span>
-                        <span class="spec-value" id="mScore" style="color: var(--accent-3);">-</span>
-                    </div>
-                </div>
-            </div>
+    <section class="gallery-section" id="works" aria-labelledby="worksTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">VISUAL ARCHIVE</p>
+          <h2 id="worksTitle">精选作品</h2>
         </div>
+        <div class="filters" role="group" aria-label="筛选视频方向">
+          <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">ALL</button>
+          <button class="filter" type="button" data-filter="landscape" aria-pressed="false">LANDSCAPE</button>
+          <button class="filter" type="button" data-filter="portrait" aria-pressed="false">PORTRAIT</button>
+        </div>
+      </div>
+
+      <div class="gallery" id="gallery" aria-live="polite"></div>
+      <p class="empty-state" id="emptyState" hidden>当前分类暂无作品。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>SELECTED MOTION WORKS</span>
+    <span>© 2026</span>
+  </footer>
+
+  <div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="playerTitle" aria-hidden="true">
+    <div class="player__backdrop" data-close-player></div>
+    <div class="player__shell">
+      <header class="player__header">
+        <div>
+          <p class="player__index" id="playerIndex">FILM 01 / 13</p>
+          <h2 id="playerTitle">MOTION 01</h2>
+        </div>
+        <button class="icon-button player__close" id="playerClose" type="button" aria-label="关闭播放器">
+          <span></span><span></span>
+        </button>
+      </header>
+
+      <div class="player__stage" id="playerStage">
+        <div class="player__loading" id="playerLoading" aria-live="polite">
+          <span></span>
+          <p>LOADING FILM</p>
+        </div>
+        <video id="mainVideo" controls playsinline preload="metadata"></video>
+        <p class="player__error" id="playerError" hidden>视频加载失败，请检查网络后重试。</p>
+      </div>
+
+      <footer class="player__footer">
+        <button class="player-nav" id="playerPrev" type="button" aria-label="播放上一个作品">
+          <span>←</span><small>PREVIOUS</small>
+        </button>
+        <div class="player__meta">
+          <span id="playerDuration">15.0 SEC</span>
+          <span id="playerFormat">LANDSCAPE</span>
+        </div>
+        <button class="player-nav player-nav--next" id="playerNext" type="button" aria-label="播放下一个作品">
+          <small>NEXT</small><span>→</span>
+        </button>
+      </footer>
     </div>
+  </div>
 
-    <footer>
-        &copy; 2026 Visionary 视觉艺术工作室. All Rights Reserved.
-    </footer>
-
-    <script>
-        // 模态框逻辑
-        const modal = document.getElementById('playerModal');
-        const video = document.getElementById('mainVideo');
-        
-        function openPlayer(src, title, duration, res, score) {
-            video.src = src;
-            document.getElementById('mTitle').textContent = title;
-            document.getElementById('mDuration').textContent = duration;
-            document.getElementById('mRes').textContent = res;
-            document.getElementById('mScore').textContent = score;
-            modal.classList.add('active');
-        }
-
-        function closePlayer() {
-            modal.classList.remove('active');
-            video.pause();
-            video.src = '';
-        }
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closePlayer();
-        });
-
-        // 高颜值交互式粒子背景动画 Canvas
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-        let mouse = { x: null, y: null };
-
-        function initCanvas() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            
-            // 响应屏幕尺寸调整粒子数量
-            const particleCount = Math.floor(width * height / 15000);
-            particles = [];
-            
-            for (let i = 0; i < particleCount; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.8,
-                    vy: (Math.random() - 0.5) * 0.8,
-                    radius: Math.random() * 2 + 1,
-                    color: Math.random() > 0.5 ? 'rgba(6, 182, 212, 0.6)' : 'rgba(139, 92, 246, 0.6)'
-                });
-            }
-        }
-
-        window.addEventListener('resize', initCanvas);
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
-        });
-        window.addEventListener('mouseleave', () => {
-            mouse.x = null;
-            mouse.y = null;
-        });
-
-        initCanvas();
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            
-            // 更新和绘制粒子
-            for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                
-                // 边界反弹
-                if (p.x < 0 || p.x > width) p.vx *= -1;
-                if (p.y < 0 || p.y > height) p.vy *= -1;
-                
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.fill();
-                
-                // 粒子连线
-                for (let j = i + 1; j < particles.length; j++) {
-                    let p2 = particles[j];
-                    let dx = p.x - p2.x;
-                    let dy = p.y - p2.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < 120) {
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 * (1 - dist / 120)})`;
-                        ctx.lineWidth = 0.8;
-                        ctx.stroke();
-                    }
-                }
-                
-                // 鼠标交互连线
-                if (mouse.x != null) {
-                    let dx = p.x - mouse.x;
-                    let dy = p.y - mouse.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < 180) {
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(mouse.x, mouse.y);
-                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.3 * (1 - dist / 180)})`;
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
-                        
-                        // 鼠标排斥力
-                        if (dist < 80) {
-                            p.x += dx * 0.01;
-                            p.y += dy * 0.01;
-                        }
-                    }
-                }
-            }
-            requestAnimationFrame(animate);
-        }
-        animate();
-    </script>
+  <noscript>请启用 JavaScript 以浏览和播放作品。</noscript>
+  <script src="assets/data.js" defer></script>
+  <script src="assets/app.js" defer></script>
 </body>
 </html>
