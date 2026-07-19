@@ -266,3 +266,93 @@ body.is-ready .hero__description { transition-delay:.24s; }
   .atmosphere,.cursor-glow { display:none; }
   .work-card { opacity:1; transform:none; }
 }
+
+
+/* Portfolio-first layout: the gallery is the opening view. */
+main { min-height: 100svh; }
+
+.gallery-section {
+  padding-top: calc(var(--header-h) + clamp(54px, 7vw, 104px));
+  padding-bottom: 120px;
+}
+
+.section-heading {
+  align-items: flex-end;
+  margin-bottom: clamp(32px, 5vw, 64px);
+}
+
+.section-heading h1 {
+  margin: 0;
+  max-width: 760px;
+  font-size: clamp(44px, 6.4vw, 96px);
+  line-height: .92;
+  letter-spacing: -.065em;
+}
+
+.section-intro {
+  max-width: 520px;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: clamp(12px, 1vw, 15px);
+  letter-spacing: .035em;
+}
+
+.gallery {
+  grid-auto-flow: row;
+  grid-auto-rows: clamp(390px, 33vw, 520px);
+  gap: clamp(14px, 1.5vw, 24px);
+}
+
+.work-card--portrait,
+.work-card--landscape {
+  aspect-ratio: auto;
+  min-height: 0;
+}
+
+.work-card {
+  border-radius: 3px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .22);
+}
+
+.work-card__media {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(143, 103, 255, .14), transparent 44%),
+    #101015;
+}
+
+.work-card__image {
+  opacity: 1;
+  object-position: center;
+}
+
+.work-card__meta {
+  display: block;
+  max-width: 220px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1180px) {
+  .gallery { grid-auto-rows: clamp(360px, 43vw, 480px); }
+}
+
+@media (max-width: 860px) {
+  .gallery-section { padding-top: calc(var(--header-h) + 48px); }
+  .section-heading { align-items: flex-start; }
+  .gallery { grid-auto-rows: clamp(330px, 56vw, 440px); }
+}
+
+@media (max-width: 560px) {
+  .gallery-section {
+    padding-top: calc(var(--header-h) + 38px);
+    padding-bottom: 80px;
+  }
+  .section-heading h1 { font-size: clamp(42px, 14vw, 68px); }
+  .section-intro { margin-top: 18px; }
+  .gallery { grid-auto-rows: clamp(280px, 86vw, 390px); }
+  .work-card__bottom { gap: 10px; }
+}
+
+@media (max-width: 380px) {
+  .gallery { grid-auto-rows: 430px; }
+  .work-card--landscape { grid-column: span 1; }
+}
