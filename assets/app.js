@@ -41,14 +41,14 @@
     return `
       <button class="work-card work-card--${work.orientation}" type="button" data-id="${work.id}" aria-label="播放 ${work.title}">
         <span class="work-card__media">
-          <img class="work-card__image" src="${work.thumbnail}" alt="${work.title} 视频封面" loading="lazy" decoding="async">
+          <img class="work-card__image" src="${work.thumbnail}" alt="${work.title} 视频封面" loading="${work.id <= 4 ? 'eager' : 'lazy'}" fetchpriority="${work.id <= 4 ? 'high' : 'auto'}" decoding="async">
         </span>
         <span class="work-card__chrome">
           <span class="work-card__top"><span>FILM ${number}</span><span>${work.duration} SEC</span></span>
           <span class="work-card__bottom">
             <span>
               <strong class="work-card__title">${work.title}</strong>
-              <span class="work-card__meta">${orientationLabel} · ${work.resolution}</span>
+              <span class="work-card__meta">${work.subtitle || `${orientationLabel} · ${work.resolution}`}</span>
             </span>
             <span class="work-card__play" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -262,14 +262,16 @@
         cursorGlow.style.top = `${event.clientY}px`;
         cursorGlow.classList.add('is-visible');
 
-        const rect = hero.getBoundingClientRect();
-        if (rect.bottom > 0) {
-          const x = event.clientX / window.innerWidth - 0.5;
-          const y = event.clientY / window.innerHeight - 0.5;
-          reelFrames.forEach(frame => {
-            const depth = Number(frame.dataset.depth || 0.5);
-            frame.style.translate = `${x * depth * 24}px ${y * depth * 18}px`;
-          });
+        if (hero) {
+          const rect = hero.getBoundingClientRect();
+          if (rect.bottom > 0) {
+            const x = event.clientX / window.innerWidth - 0.5;
+            const y = event.clientY / window.innerHeight - 0.5;
+            reelFrames.forEach(frame => {
+              const depth = Number(frame.dataset.depth || 0.5);
+              frame.style.translate = `${x * depth * 24}px ${y * depth * 18}px`;
+            });
+          }
         }
       }, { passive: true });
       document.addEventListener('mouseleave', () => cursorGlow.classList.remove('is-visible'));
