@@ -4,6 +4,11 @@
   const works = Array.isArray(window.MOTION_WORKS) ? window.MOTION_WORKS : [];
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const saveData = Boolean(connection?.saveData);
+  const slowConnection = ['slow-2g', '2g', '3g'].includes(connection?.effectiveType);
+  const allowPreview = canHover && !prefersReducedMotion && !saveData && !slowConnection;
+  const allowAtmosphere = window.innerWidth > 860 && !prefersReducedMotion && !saveData && !slowConnection;
 
   const gallery = document.getElementById('gallery');
   const emptyState = document.getElementById('emptyState');
@@ -13,6 +18,7 @@
   const mainVideo = document.getElementById('mainVideo');
   const playerLoading = document.getElementById('playerLoading');
   const playerError = document.getElementById('playerError');
+  const playerRetry = document.getElementById('playerRetry');
   const playerTitle = document.getElementById('playerTitle');
   const playerIndex = document.getElementById('playerIndex');
   const playerDuration = document.getElementById('playerDuration');
@@ -22,6 +28,8 @@
   const playerNext = document.getElementById('playerNext');
   const headerCount = document.getElementById('headerCount');
   const siteHeader = document.getElementById('siteHeader');
+  const siteFooter = document.getElementById('siteFooter');
+  const pageMain = document.querySelector('main');
   const scrollProgress = document.getElementById('scrollProgress');
   const cursorGlow = document.getElementById('cursorGlow');
   const preloader = document.getElementById('preloader');
@@ -31,24 +39,39 @@
   let currentIndex = 0;
   let lastFocusedElement = null;
   let previewTimer = null;
+  let activePreviewCard = null;
   let touchStartX = 0;
+  let touchStartY = 0;
+  let loadTimeout = null;
+  let resizeTimer = null;
 
   headerCount.textContent = `${String(works.length).padStart(2, '0')} FILMS`;
 
-  function cardTemplate(work) {
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function cardTemplate(work, index) {
     const number = String(work.id).padStart(2, '0');
     const orientationLabel = work.orientation === 'landscape' ? 'LANDSCAPE' : 'PORTRAIT';
+    const eager = index < 2;
+    const highPriority = index === 0;
     return `
-      <button class="work-card work-card--${work.orientation}" type="button" data-id="${work.id}" aria-label="播放 ${work.title}">
+      <button class="work-card work-card--${escapeHtml(work.orientation)}" type="button" data-id="${Number(work.id)}" aria-label="播放 ${escapeHtml(work.title)}">
         <span class="work-card__media">
-          <img class="work-card__image" src="${work.thumbnail}" alt="${work.title} 视频封面" loading="${work.id <= 4 ? 'eager' : 'lazy'}" fetchpriority="${work.id <= 4 ? 'high' : 'auto'}" decoding="async">
+          <img class="work-card__image" src="${escapeHtml(work.thumbnail)}" alt="${escapeHtml(work.title)} 视频封面" loading="${eager ? 'eager' : 'lazy'}" fetchpriority="${highPriority ? 'high' : 'auto'}" decoding="async">
         </span>
         <span class="work-card__chrome">
-          <span class="work-card__top"><span>FILM ${number}</span><span>${work.duration} SEC</span></span>
+          <span class="work-card__top"><span>FILM ${number}</span><span>${escapeHtml(work.duration)} SEC</span></span>
           <span class="work-card__bottom">
             <span>
-              <strong class="work-card__title">${work.title}</strong>
-              <span class="work-card__meta">${work.subtitle || `${orientationLabel} · ${work.resolution}`}</span>
+              <strong class="work-card__title">${escapeHtml(work.title)}</strong>
+              <span class="work-card__meta">${escapeHtml(work.subtitle || `${orientationLabel} · ${work.resolution}`)}</span>
             </span>
             <span class="work-card__play" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -60,23 +83,6 @@
       </button>`;
   }
 
-  function renderGallery(filter = activeFilter) {
-    activeFilter = filter;
-    visibleWorks = filter === 'all' ? [...works] : works.filter(work => work.orientation === filter);
-    gallery.innerHTML = visibleWorks.map(cardTemplate).join('');
-    emptyState.hidden = visibleWorks.length > 0;
-
-    const cards = [...gallery.querySelectorAll('.work-card')];
-    cards.forEach((card, index) => {
-      const workId = Number(card.dataset.id);
-      const work = works.find(item => item.id === workId);
-      card.addEventListener('click', () => openPlayer(workId));
-      card.style.transitionDelay = `${Math.min(index * 45, 360)}ms`;
-      setupCardEffects(card, work);
-      cardObserver?.observe(card);
-    });
-  }
-
   const cardObserver = 'IntersectionObserver' in window
     ? new IntersectionObserver(entries => {
         entries.forEach(entry => {
@@ -85,26 +91,60 @@
             cardObserver.unobserve(entry.target);
           }
         });
-      }, { rootMargin: '0px 0px -7% 0px', threshold: 0.08 })
+      }, { rootMargin: '0px 0px -5% 0px', threshold: 0.06 })
     : null;
+
+  function layoutMasonry() {
+    if (!gallery || !gallery.children.length) return;
+    const styles = getComputedStyle(gallery);
+    const rowHeight = parseFloat(styles.gridAutoRows) || 8;
+    const gap = parseFloat(styles.rowGap) || 0;
+
+    [...gallery.children].forEach(card => {
+      card.style.gridRowEnd = 'auto';
+      const height = card.getBoundingClientRect().height;
+      const span = Math.max(1, Math.ceil((height + gap) / (rowHeight + gap)));
+      card.style.gridRowEnd = `span ${span}`;
+    });
+  }
+
+  function renderGallery(filter = activeFilter) {
+    activeFilter = filter;
+    visibleWorks = filter === 'all' ? [...works] : works.filter(work => work.orientation === filter);
+    stopAllPreviews();
+    cardObserver?.disconnect();
+    gallery.innerHTML = visibleWorks.map(cardTemplate).join('');
+    emptyState.hidden = visibleWorks.length > 0;
+
+    const cards = [...gallery.querySelectorAll('.work-card')];
+    cards.forEach((card, index) => {
+      const workId = Number(card.dataset.id);
+      const work = works.find(item => item.id === workId);
+      card.addEventListener('click', () => openPlayer(workId));
+      card.style.transitionDelay = prefersReducedMotion ? '0ms' : `${Math.min(index * 35, 280)}ms`;
+      setupCardEffects(card, work);
+      cardObserver ? cardObserver.observe(card) : card.classList.add('is-visible');
+      card.querySelector('img')?.addEventListener('load', layoutMasonry, { once: true });
+    });
+
+    requestAnimationFrame(layoutMasonry);
+  }
 
   function setupCardEffects(card, work) {
     const media = card.querySelector('.work-card__media');
-
-    if (!cardObserver) card.classList.add('is-visible');
 
     card.addEventListener('pointermove', event => {
       if (!canHover || prefersReducedMotion) return;
       const rect = card.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
       const y = (event.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `perspective(900px) rotateX(${y * -3.6}deg) rotateY(${x * 4.2}deg) translateY(-4px)`;
+      card.style.transform = `perspective(900px) rotateX(${y * -2.4}deg) rotateY(${x * 2.8}deg) translateY(-3px)`;
     });
 
     card.addEventListener('pointerenter', () => {
-      if (!canHover || prefersReducedMotion) return;
+      if (!allowPreview || !work?.preview) return;
       clearTimeout(previewTimer);
-      previewTimer = window.setTimeout(() => startPreview(card, media, work), 550);
+      previewTimer = window.setTimeout(() => startPreview(card, media, work), 700);
     });
 
     card.addEventListener('pointerleave', () => {
@@ -115,29 +155,42 @@
   }
 
   function startPreview(card, media, work) {
-    if (card.querySelector('video') || player.classList.contains('is-open')) return;
+    if (!allowPreview || !work.preview || player.classList.contains('is-open')) return;
+    if (activePreviewCard && activePreviewCard !== card) stopPreview(activePreviewCard);
+    if (card.querySelector('video')) return;
+
     const preview = document.createElement('video');
     preview.className = 'work-card__preview';
     preview.muted = true;
     preview.loop = true;
     preview.playsInline = true;
     preview.preload = 'metadata';
-    preview.src = work.video;
+    preview.src = work.preview;
     preview.addEventListener('canplay', () => {
       card.classList.add('is-previewing');
+      activePreviewCard = card;
       preview.play().catch(() => stopPreview(card));
     }, { once: true });
+    preview.addEventListener('error', () => stopPreview(card), { once: true });
     media.appendChild(preview);
   }
 
   function stopPreview(card) {
+    if (!card) return;
     const preview = card.querySelector('.work-card__preview');
     card.classList.remove('is-previewing');
+    if (activePreviewCard === card) activePreviewCard = null;
     if (!preview) return;
     preview.pause();
     preview.removeAttribute('src');
     preview.load();
     preview.remove();
+  }
+
+  function stopAllPreviews() {
+    clearTimeout(previewTimer);
+    document.querySelectorAll('.work-card').forEach(stopPreview);
+    activePreviewCard = null;
   }
 
   filters.forEach(button => {
@@ -151,18 +204,32 @@
     });
   });
 
+  function setPageInert(isInert) {
+    [siteHeader, pageMain, siteFooter].forEach(element => {
+      if (element) element.inert = isInert;
+    });
+  }
+
   function openPlayer(workId) {
     const foundIndex = works.findIndex(work => work.id === workId);
     if (foundIndex < 0) return;
 
     currentIndex = foundIndex;
     lastFocusedElement = document.activeElement;
-    document.querySelectorAll('.work-card').forEach(stopPreview);
+    stopAllPreviews();
     player.classList.add('is-open');
     player.setAttribute('aria-hidden', 'false');
     document.body.classList.add('player-open');
+    setPageInert(true);
     loadCurrentWork();
-    window.setTimeout(() => playerClose.focus(), 100);
+    window.setTimeout(() => playerClose.focus(), 80);
+  }
+
+  function clearVideo() {
+    clearTimeout(loadTimeout);
+    mainVideo.pause();
+    mainVideo.removeAttribute('src');
+    mainVideo.load();
   }
 
   function closePlayer() {
@@ -170,16 +237,24 @@
     player.classList.remove('is-open');
     player.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('player-open');
-    mainVideo.pause();
-    mainVideo.removeAttribute('src');
-    mainVideo.load();
-    window.setTimeout(() => lastFocusedElement?.focus(), 120);
+    setPageInert(false);
+    clearVideo();
+    playerLoading.classList.add('is-hidden');
+    playerError.hidden = true;
+    window.setTimeout(() => lastFocusedElement?.focus(), 100);
+  }
+
+  function showLoadError() {
+    clearTimeout(loadTimeout);
+    playerLoading.classList.add('is-hidden');
+    playerError.hidden = false;
   }
 
   function loadCurrentWork(direction = 0) {
     const work = works[currentIndex];
     if (!work) return;
 
+    clearTimeout(loadTimeout);
     playerLoading.classList.remove('is-hidden');
     playerError.hidden = true;
     mainVideo.pause();
@@ -193,11 +268,13 @@
     playerFormat.textContent = `${work.orientation.toUpperCase()} · ${work.resolution}`;
     mainVideo.load();
 
+    loadTimeout = window.setTimeout(showLoadError, slowConnection ? 18000 : 12000);
+
     if (direction !== 0 && !prefersReducedMotion) {
       playerStage.animate([
-        { opacity: .35, transform: `translateX(${direction * 24}px)` },
+        { opacity: .35, transform: `translateX(${direction * 18}px)` },
         { opacity: 1, transform: 'translateX(0)' }
-      ], { duration: 380, easing: 'cubic-bezier(.16,1,.3,1)' });
+      ], { duration: 320, easing: 'cubic-bezier(.16,1,.3,1)' });
     }
   }
 
@@ -207,27 +284,37 @@
   }
 
   mainVideo.addEventListener('loadeddata', () => {
+    clearTimeout(loadTimeout);
     playerLoading.classList.add('is-hidden');
+    playerError.hidden = true;
     mainVideo.play().catch(() => {});
   });
-  mainVideo.addEventListener('canplay', () => playerLoading.classList.add('is-hidden'));
-  mainVideo.addEventListener('error', () => {
+  mainVideo.addEventListener('canplay', () => {
+    clearTimeout(loadTimeout);
     playerLoading.classList.add('is-hidden');
-    playerError.hidden = false;
   });
+  mainVideo.addEventListener('error', showLoadError);
 
+  playerRetry.addEventListener('click', () => loadCurrentWork());
   playerClose.addEventListener('click', closePlayer);
   playerPrev.addEventListener('click', () => stepPlayer(-1));
   playerNext.addEventListener('click', () => stepPlayer(1));
   player.querySelector('[data-close-player]').addEventListener('click', closePlayer);
 
-  player.addEventListener('touchstart', event => {
+  playerStage.addEventListener('touchstart', event => {
+    if (event.target === mainVideo) return;
     touchStartX = event.changedTouches[0]?.clientX ?? 0;
+    touchStartY = event.changedTouches[0]?.clientY ?? 0;
   }, { passive: true });
-  player.addEventListener('touchend', event => {
-    const endX = event.changedTouches[0]?.clientX ?? touchStartX;
-    const delta = endX - touchStartX;
-    if (Math.abs(delta) > 70) stepPlayer(delta < 0 ? 1 : -1);
+
+  playerStage.addEventListener('touchend', event => {
+    if (event.target === mainVideo) return;
+    const touch = event.changedTouches[0];
+    const deltaX = (touch?.clientX ?? touchStartX) - touchStartX;
+    const deltaY = (touch?.clientY ?? touchStartY) - touchStartY;
+    if (Math.abs(deltaX) > 80 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+      stepPlayer(deltaX < 0 ? 1 : -1);
+    }
   }, { passive: true });
 
   document.addEventListener('keydown', event => {
@@ -239,7 +326,7 @@
   });
 
   function trapFocus(event) {
-    const focusable = [...player.querySelectorAll('button,[controls]')].filter(element => !element.disabled);
+    const focusable = [...player.querySelectorAll('button,video[controls]')].filter(element => !element.disabled && !element.hidden);
     if (!focusable.length) return;
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
@@ -253,26 +340,11 @@
   }
 
   function setupGlobalMotion() {
-    const reelFrames = [...document.querySelectorAll('.reel-frame')];
-    const hero = document.querySelector('.hero');
-
     if (canHover && !prefersReducedMotion) {
       window.addEventListener('pointermove', event => {
         cursorGlow.style.left = `${event.clientX}px`;
         cursorGlow.style.top = `${event.clientY}px`;
         cursorGlow.classList.add('is-visible');
-
-        if (hero) {
-          const rect = hero.getBoundingClientRect();
-          if (rect.bottom > 0) {
-            const x = event.clientX / window.innerWidth - 0.5;
-            const y = event.clientY / window.innerHeight - 0.5;
-            reelFrames.forEach(frame => {
-              const depth = Number(frame.dataset.depth || 0.5);
-              frame.style.translate = `${x * depth * 24}px ${y * depth * 18}px`;
-            });
-          }
-        }
       }, { passive: true });
       document.addEventListener('mouseleave', () => cursorGlow.classList.remove('is-visible'));
     }
@@ -288,17 +360,20 @@
   }
 
   function setupAtmosphere() {
-    if (prefersReducedMotion) return;
+    if (!allowAtmosphere) return;
     const canvas = document.getElementById('atmosphere');
-    const context = canvas.getContext('2d', { alpha: true });
+    const context = canvas?.getContext('2d', { alpha: true });
+    if (!canvas || !context) return;
+
     let particles = [];
     let frameId = 0;
     let width = 0;
     let height = 0;
     let active = true;
+    let lastFrame = 0;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = Math.floor(width * dpr);
@@ -306,19 +381,23 @@
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(72, Math.max(24, Math.floor((width * height) / 26000)));
+      const count = Math.min(46, Math.max(20, Math.floor((width * height) / 42000)));
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 1.5 + .4,
-        vx: (Math.random() - .5) * .14,
-        vy: (Math.random() - .5) * .14,
-        alpha: Math.random() * .45 + .12
+        radius: Math.random() * 1.3 + .35,
+        vx: (Math.random() - .5) * .12,
+        vy: (Math.random() - .5) * .12,
+        alpha: Math.random() * .35 + .10
       }));
+      layoutMasonry();
     };
 
-    const draw = () => {
+    const draw = timestamp => {
       if (!active) return;
+      frameId = requestAnimationFrame(draw);
+      if (timestamp - lastFrame < 33) return;
+      lastFrame = timestamp;
       context.clearRect(0, 0, width, height);
       particles.forEach(particle => {
         particle.x += particle.vx;
@@ -332,23 +411,36 @@
         context.fillStyle = `rgba(255,255,255,${particle.alpha})`;
         context.fill();
       });
-      frameId = requestAnimationFrame(draw);
     };
 
     document.addEventListener('visibilitychange', () => {
       active = !document.hidden;
       cancelAnimationFrame(frameId);
-      if (active) draw();
+      if (active) frameId = requestAnimationFrame(draw);
     });
-    window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(resize, 120);
+    }, { passive: true });
     resize();
-    draw();
+    frameId = requestAnimationFrame(draw);
   }
 
-  window.addEventListener('load', () => {
-    preloader.classList.add('is-hidden');
-    document.body.classList.add('is-ready');
-  }, { once: true });
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(layoutMasonry, 120);
+  }, { passive: true });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopAllPreviews();
+      if (!mainVideo.paused) mainVideo.pause();
+    }
+  });
+
+  const hidePreloader = () => preloader?.classList.add('is-hidden');
+  document.addEventListener('DOMContentLoaded', hidePreloader, { once: true });
+  window.setTimeout(hidePreloader, 1400);
 
   renderGallery();
   setupGlobalMotion();
