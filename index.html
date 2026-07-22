@@ -7,9 +7,15 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="精选 AI 影像、商品视觉与短视频作品，覆盖服装展示、商业口播、产品广告、城市影像与国风叙事。">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Motion Works">
   <meta property="og:title" content="精选动态作品｜AI 视频作品集">
   <meta property="og:description" content="AI 影像、商品视觉与短视频精选作品。">
-  <meta property="og:image" content="thumbnails/1_thumb.jpg">
+  <meta property="og:url" content="https://works.devs.surf/">
+  <meta property="og:image" content="https://works.devs.surf/thumbnails/1_thumb.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="精选动态作品｜AI 视频作品集">
+  <meta name="twitter:description" content="AI 影像、商品视觉与短视频精选作品。">
+  <meta name="twitter:image" content="https://works.devs.surf/thumbnails/1_thumb.jpg">
   <link rel="canonical" href="https://works.devs.surf/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="thumbnails/1_thumb.jpg" as="image" fetchpriority="high">
@@ -33,7 +39,7 @@
       <span class="wordmark__dot"></span>
       <span>MOTION WORKS</span>
     </a>
-    <div class="header-meta">
+    <div class="header-meta" aria-label="作品统计">
       <span id="headerCount">13 FILMS</span>
       <span class="header-meta__divider"></span>
       <span>VISUAL ARCHIVE</span>
@@ -41,7 +47,6 @@
   </header>
 
   <main id="top">
-
     <section class="gallery-section" id="works" aria-labelledby="worksTitle">
       <div class="section-heading">
         <div>
@@ -61,7 +66,7 @@
     </section>
   </main>
 
-  <footer class="site-footer">
+  <footer class="site-footer" id="siteFooter">
     <span>精选动态作品</span>
     <span>VISUAL ARCHIVE · 2026</span>
   </footer>
@@ -84,8 +89,11 @@
           <span></span>
           <p>LOADING FILM</p>
         </div>
-        <video id="mainVideo" controls playsinline preload="metadata"></video>
-        <p class="player__error" id="playerError" hidden>视频加载失败，请检查网络后重试。</p>
+        <video id="mainVideo" controls playsinline webkit-playsinline preload="metadata"></video>
+        <div class="player__error" id="playerError" role="status" hidden>
+          <p>视频加载较慢或连接失败。</p>
+          <button id="playerRetry" type="button">重新加载</button>
+        </div>
       </div>
 
       <footer class="player__footer">
@@ -103,7 +111,7 @@
     </div>
   </div>
 
-  <noscript>请启用 JavaScript 以浏览和播放作品。</noscript>
+  <noscript><div class="noscript">请启用 JavaScript 以浏览和播放作品。</div></noscript>
   <script src="assets/data.js" defer></script>
   <script src="assets/app.js" defer></script>
 </body>
