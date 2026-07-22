@@ -1,0 +1,96 @@
+/* Lightweight resilience layer: safe to remove without affecting the core gallery. */
+.network-notice {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 7000;
+  max-width: min(560px, calc(100vw - 28px));
+  padding: 11px 16px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 999px;
+  background: rgba(12, 12, 16, .92);
+  color: #f8f7f4;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, .35);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+  transform: translateX(-50%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.network-notice[hidden] { display: none; }
+
+.player__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.player__actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 999px;
+  color: #f8f7f4;
+  text-decoration: none;
+  font-weight: 750;
+}
+.player__actions a:hover { border-color: #b8ff5a; color: #b8ff5a; }
+.player__actions a:focus-visible { outline: 2px solid #b8ff5a; outline-offset: 3px; }
+.player__actions a[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+
+@supports (content-visibility: auto) {
+  .work-card__media {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 520px;
+  }
+}
+
+html.is-save-data .atmosphere,
+html.is-save-data .noise,
+html.is-slow-network .atmosphere,
+html.is-slow-network .noise,
+html.is-offline .atmosphere,
+html.is-offline .noise {
+  display: none;
+}
+html.is-save-data .aurora,
+html.is-slow-network .aurora,
+html.is-offline .aurora {
+  animation: none;
+  filter: none;
+  opacity: .58;
+}
+html.is-save-data .site-header.is-scrolled,
+html.is-save-data .filters,
+html.is-slow-network .site-header.is-scrolled,
+html.is-slow-network .filters {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+@media (max-width: 560px) {
+  .noise { display: none; }
+  .aurora { filter: none; opacity: .62; }
+  .site-header.is-scrolled,
+  .filters,
+  .player__backdrop,
+  .work-card__play {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .network-notice {
+    width: calc(100vw - 24px);
+    border-radius: 14px;
+  }
+}
+
+@media (prefers-reduced-data: reduce) {
+  .atmosphere,
+  .noise,
+  .cursor-glow { display: none; }
+  .aurora { animation: none; filter: none; }
+}
