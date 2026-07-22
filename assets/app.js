@@ -43,7 +43,8 @@
   let touchStartX = 0;
   let touchStartY = 0;
   let loadTimeout = null;
-  let resizeTimer = null;
+  let layoutResizeTimer = null;
+  let canvasResizeTimer = null;
 
   headerCount.textContent = `${String(works.length).padStart(2, '0')} FILMS`;
 
@@ -110,6 +111,7 @@
 
   function renderGallery(filter = activeFilter) {
     activeFilter = filter;
+    gallery.dataset.filter = filter;
     visibleWorks = filter === 'all' ? [...works] : works.filter(work => work.orientation === filter);
     stopAllPreviews();
     cardObserver?.disconnect();
@@ -419,16 +421,16 @@
       if (active) frameId = requestAnimationFrame(draw);
     });
     window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(resize, 120);
+      clearTimeout(canvasResizeTimer);
+      canvasResizeTimer = window.setTimeout(resize, 120);
     }, { passive: true });
     resize();
     frameId = requestAnimationFrame(draw);
   }
 
   window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(layoutMasonry, 120);
+    clearTimeout(layoutResizeTimer);
+    layoutResizeTimer = window.setTimeout(layoutMasonry, 120);
   }, { passive: true });
 
   document.addEventListener('visibilitychange', () => {
