@@ -270,7 +270,7 @@
     playerFormat.textContent = `${work.orientation.toUpperCase()} · ${work.resolution}`;
     mainVideo.load();
 
-    loadTimeout = window.setTimeout(showLoadError, slowConnection ? 18000 : 12000);
+    loadTimeout = window.setTimeout(showLoadError, slowConnection ? 45000 : 30000);
 
     if (direction !== 0 && !prefersReducedMotion) {
       playerStage.animate([

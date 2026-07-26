@@ -12,6 +12,8 @@
 - 手机端只加载封面，点击作品后才请求正式视频
 - 桌面端仅在作品数据配置低码率 `preview` 文件时启用悬停预览，不再使用原始视频预览
 - 视频加载超时、失败提示、重新加载和单独打开视频入口
+- 正式视频统一使用 H.264 Main、AAC、`yuv420p` 与 Fast Start，兼容主流桌面和移动浏览器
+- 网页版本最长边控制在 1280 像素，视频码率上限约 4 Mbps，降低弱网首播等待
 - 动态光雾、轻量粒子背景、鼠标光效与滚动入场
 - 弱网、节省流量、触屏设备和减少动画模式自动降级
 - 360px 至大屏响应式布局
@@ -40,6 +42,12 @@
 4. `orientation` 填写 `landscape` 或 `portrait`。
 5. 如有单独制作的低码率预览视频，可增加 `preview: 'previews/文件名.mp4'`；不要将正式视频地址直接作为预览。
 6. 修改静态资源后，同步更新 `index.html` 和 `service-worker.js` 中的版本号与缓存名称。
+
+## 视频兼容性
+
+正式视频必须使用 H.264，不要直接上传仅含 HEVC/H.265 视频轨道的 MP4。仓库提供
+`scripts/optimize-videos.sh` 和 `scripts/validate-videos.sh`，并可在 GitHub Actions
+中手动运行 `Optimize portfolio videos` 工作流完成批量转换与校验。
 
 ## 缓存策略
 
