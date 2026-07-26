@@ -1,0 +1,48 @@
+name: Optimize portfolio videos
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: optimize-portfolio-videos
+  cancel-in-progress: false
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out requested branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Install video tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+
+      - name: Optimize videos
+        run: bash scripts/optimize-videos.sh
+
+      - name: Validate browser compatibility
+        run: bash scripts/validate-videos.sh
+
+      - name: Commit optimized videos
+        run: |
+          if git diff --quiet -- videos; then
+            echo "No video changes were required."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add videos
+          git commit -m "Optimize videos for browser playback"
+          git push origin "HEAD:${{ github.ref_name }}"
+
