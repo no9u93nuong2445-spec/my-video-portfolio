@@ -59,8 +59,7 @@ git -C "$HF_DIR" sparse-checkout set \
   skills/hyperframes-creative \
   skills/media-use \
   skills/hyperframes-cli \
-  skills/hyperframes-registry \
-  LICENSE README.md >/dev/null
+  skills/hyperframes-registry >/dev/null
 
 for name in hyperframes hyperframes-core hyperframes-animation hyperframes-keyframes hyperframes-creative media-use hyperframes-cli hyperframes-registry; do
   copy_skill_dir "$HF_DIR/skills/$name" "$name"
