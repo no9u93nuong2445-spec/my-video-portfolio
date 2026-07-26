@@ -1,0 +1,74 @@
+name: Vendor AI video skills
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - chore/install-ai-video-skills
+    paths:
+      - .github/workflows/vendor-ai-video-skills.yml
+      - tools/ai-video-skills/vendor.sh
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vendor-ai-video-skills-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vendor:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Vendor recommended skill set
+        run: bash tools/ai-video-skills/vendor.sh
+
+      - name: Verify required skills
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            video-director
+            hyperframes
+            hyperframes-core
+            hyperframes-animation
+            hyperframes-keyframes
+            hyperframes-creative
+            media-use
+            hyperframes-cli
+            hyperframes-registry
+            video-use
+            watch
+            seedance-prompt-en
+            seedance-prompt-zh
+          )
+          for skill in "${required[@]}"; do
+            test -f ".codex/skills/${skill}/SKILL.md" || {
+              echo "Missing .codex/skills/${skill}/SKILL.md" >&2
+              exit 1
+            }
+          done
+          test -s tools/ai-video-skills/LOCK.json
+
+      - name: Commit vendored skills
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .codex/skills tools/ai-video-skills/LOCK.json
+          if git diff --cached --quiet; then
+            echo "Skill set already up to date."
+            exit 0
+          fi
+          git commit -m "chore: vendor recommended AI video skills [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
