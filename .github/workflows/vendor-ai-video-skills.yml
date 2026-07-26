@@ -8,6 +8,13 @@ on:
     paths:
       - .github/workflows/vendor-ai-video-skills.yml
       - tools/ai-video-skills/vendor.sh
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/vendor-ai-video-skills.yml
+      - tools/ai-video-skills/**
+      - .codex/skills/video-director/**
 
 permissions:
   contents: write
@@ -26,7 +33,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Vendor recommended skill set
@@ -61,6 +68,8 @@ jobs:
 
       - name: Commit vendored skills
         shell: bash
+        env:
+          TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -71,4 +80,4 @@ jobs:
             exit 0
           fi
           git commit -m "chore: vendor recommended AI video skills [skip ci]"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:${TARGET_BRANCH}"
