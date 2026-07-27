@@ -1,0 +1,215 @@
+/* Final visual layer for the lightweight, video-first portfolio gallery. */
+:root {
+  --bg: #08090a;
+  --surface: #111315;
+  --line: rgba(255, 255, 255, .12);
+  --line-strong: rgba(255, 255, 255, .24);
+  --accent: #c5ff62;
+  --muted: #969aa0;
+}
+
+.preloader { animation-duration: .2s; animation-delay: .35s; }
+.preloader.is-hidden { transition-duration: .2s; }
+.atmosphere, .aurora, .noise, .cursor-glow { display: none !important; }
+.scroll-progress { height: 1px; background: var(--accent); }
+
+.site-header {
+  background: rgba(8, 9, 10, .96);
+  border-bottom-color: var(--line);
+}
+.site-header.is-scrolled {
+  background: rgba(8, 9, 10, .96);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.header-meta span:last-child, .header-meta__divider { display: none; }
+
+.gallery-section {
+  padding-top: calc(var(--header-h) + clamp(42px, 7vw, 92px));
+  padding-bottom: 72px;
+}
+.section-heading {
+  align-items: center;
+  margin-bottom: clamp(28px, 4vw, 52px);
+}
+.eyebrow {
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: .18em;
+}
+.section-heading h1 {
+  font-size: clamp(42px, 5.6vw, 78px);
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+.section-intro { display: none; }
+.filters {
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.filter {
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: .07em;
+}
+.filter.is-active { color: var(--bg); background: var(--accent); }
+.filter:not(.is-active):hover { border-color: var(--line-strong); }
+
+.gallery {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  grid-auto-flow: row;
+  gap: clamp(28px, 3vw, 48px) clamp(12px, 1.7vw, 24px);
+}
+.gallery[data-filter="landscape"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.work-card, .work-card.is-visible {
+  display: block;
+  grid-row-end: auto !important;
+  aspect-ratio: auto;
+  overflow: visible;
+  opacity: 1;
+  transform: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+  transition: opacity .35s ease;
+}
+.work-card:hover { box-shadow: none; }
+.work-card--landscape { grid-column: span 2; }
+.work-card__media {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #111315;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .18);
+}
+.work-card--landscape .work-card__media { aspect-ratio: 16 / 9; }
+.work-card__media::after {
+  background: linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, .28));
+  opacity: 1;
+}
+.work-card__image, .work-card__preview {
+  filter: none;
+  transition: transform .55s var(--ease-spring);
+}
+.work-card__preview { display: none; }
+.work-card__chrome, .work-card__shine, .work-card__outline { display: none !important; }
+.work-card__duration {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  border-radius: 999px;
+  background: rgba(8, 9, 10, .62);
+  color: rgba(255, 255, 255, .82);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+.work-card__play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.86);
+  border-color: rgba(255, 255, 255, .7);
+  background: rgba(8, 9, 10, .54);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: opacity .2s ease, transform .25s var(--ease-spring), background .2s ease;
+}
+.work-card__play svg { width: 24%; }
+.work-card__caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 2px 0;
+}
+.work-card__title {
+  display: block;
+  font-size: clamp(14px, 1.25vw, 18px);
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+.work-card__meta {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.35;
+  letter-spacing: .04em;
+}
+.work-card__number {
+  flex: 0 0 auto;
+  color: #6f747a;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+.work-card:hover .work-card__media,
+.work-card:focus-visible .work-card__media {
+  box-shadow: 0 20px 42px rgba(0, 0, 0, .32);
+}
+.work-card:hover .work-card__image,
+.work-card:focus-visible .work-card__image { transform: scale(1.025); }
+.work-card:hover .work-card__play,
+.work-card:focus-visible .work-card__play {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.work-card:hover .work-card__play svg,
+.work-card:focus-visible .work-card__play svg { fill: var(--bg); }
+.work-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+.site-footer { display: none; }
+.player__backdrop {
+  background: rgba(8, 9, 10, .94);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.player__stage { border-radius: 6px; }
+
+@media (max-width: 860px) {
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .work-card--landscape { grid-column: span 2; }
+  .section-heading { align-items: flex-start; flex-direction: column; gap: 20px; }
+}
+@media (max-width: 460px) {
+  .site-header { padding-inline: 18px; }
+  .header-meta { font-size: 10px; }
+  .gallery-section { padding-inline: 14px; }
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 25px 10px; }
+  .work-card--landscape { grid-column: span 2; }
+  .work-card__duration { top: 8px; right: 8px; font-size: 9px; }
+  .work-card__caption { padding-top: 10px; }
+  .work-card__title { font-size: 13px; }
+  .work-card__meta { font-size: 9px; }
+  .work-card__number { display: none; }
+  .work-card__play { width: 42px; height: 42px; opacity: .92; }
+}
+@media (hover: none), (pointer: coarse) {
+  .work-card__play {
+    opacity: .9;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .work-card, .work-card__image, .work-card__play { transition: none; }
+}

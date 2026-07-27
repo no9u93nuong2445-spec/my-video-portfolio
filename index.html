@@ -20,8 +20,9 @@
   <link rel="canonical" href="https://works.devs.surf/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="thumbnails/1_thumb.jpg" as="image" fetchpriority="high">
-  <link rel="stylesheet" href="assets/styles.css?v=20260727-1">
-  <link rel="stylesheet" href="assets/resilience.css?v=20260727-1">
+  <link rel="stylesheet" href="assets/styles.css?v=20260727-2">
+  <link rel="stylesheet" href="assets/resilience.css?v=20260727-2">
+  <link rel="stylesheet" href="assets/gallery.css?v=20260727-2">
   <title>精选动态作品｜AI 视频作品集</title>
 </head>
 <body>
@@ -30,10 +31,6 @@
     <span class="preloader__line"></span>
   </div>
 
-  <canvas id="atmosphere" class="atmosphere" aria-hidden="true"></canvas>
-  <div class="aurora" aria-hidden="true"></div>
-  <div class="noise" aria-hidden="true"></div>
-  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   <div class="network-notice" id="networkNotice" role="status" aria-live="polite" hidden></div>
 
@@ -53,9 +50,8 @@
     <section class="gallery-section" id="works" aria-labelledby="worksTitle">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">CURATED AI VIDEO · SELECTED WORKS</p>
-          <h1 id="worksTitle">精选动态作品</h1>
-          <p class="section-intro">横屏与竖屏影像作品集合，点击任意封面即可播放。</p>
+          <p class="eyebrow">SELECTED WORKS · 13 FILMS</p>
+          <h1 id="worksTitle">精选作品</h1>
         </div>
         <div class="filters" role="group" aria-label="按画幅筛选作品">
           <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">全部作品</button>
@@ -68,11 +64,6 @@
       <p class="empty-state" id="emptyState" hidden>当前分类暂无作品。</p>
     </section>
   </main>
-
-  <footer class="site-footer" id="siteFooter">
-    <span>精选动态作品</span>
-    <span>VISUAL ARCHIVE · 2026</span>
-  </footer>
 
   <div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="playerTitle" aria-hidden="true">
     <div class="player__backdrop" data-close-player></div>
@@ -118,8 +109,8 @@
   </div>
 
   <noscript><div class="noscript">请启用 JavaScript 以浏览和播放作品。</div></noscript>
-  <script src="assets/data.js?v=20260727-1" defer></script>
-  <script src="assets/app.js?v=20260727-1" defer></script>
-  <script src="assets/resilience.js?v=20260727-1" defer></script>
+  <script src="assets/data.js?v=20260727-2" defer></script>
+  <script src="assets/app.js?v=20260727-2" defer></script>
+  <script src="assets/resilience.js?v=20260727-2" defer></script>
 </body>
 </html>
