@@ -1,0 +1,71 @@
+name: Assemble portfolio media
+
+on:
+  push:
+    branches:
+      - agent/update-portfolio-videos
+    paths:
+      - .upload/READY
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    if: ${{ !contains(github.event.head_commit.message, '[assembled]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebuild media files
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import hashlib
+          import shutil
+
+          expected = {
+              'videos/14.mp4': '85c3c822bd2a21be8520dd3de12cd3759f15e3293af9394e34700871fc73eb65',
+              'videos/15.mp4': '33fa1db1e30f6d3c0792848339181b6115527709a64ce494b3a786ecf0f05921',
+              'videos/16.mp4': '02dfb1aea3cf3c0caf4e626fa86468d93e145f7bd788de0a74405e08e1095e13',
+              'videos/17.mp4': '35ed06be4aaf7155350adac118a264045ae3cbe4afa24b61fc01fffbb9be349e',
+              'thumbnails/14_thumb.jpg': '1bf7a0514d52fae57e7068e3c55ca82327653b9019d4eee129516d725776a11d',
+              'thumbnails/15_thumb.jpg': '8f6afb05a2e4e969096320ee8a4bfea4f1f4a4b24d5acd9d2af1878a15cdd72c',
+              'thumbnails/16_thumb.jpg': '66cdb7ab4552941ad0f1db8e52f87950c24260c4e1dff468abd1b4c3515d9f50',
+              'thumbnails/17_thumb.jpg': '21a59a42957b11b00ea20a53d44dfa50d039d055a0cfa64d910dcea6c40944af',
+          }
+
+          upload_dir = Path('.upload')
+          for target_name, expected_sha in expected.items():
+              key = target_name.replace('/', '__')
+              parts = sorted(upload_dir.glob(f'{key}.part*'))
+              if not parts:
+                  raise RuntimeError(f'Missing upload chunks for {target_name}')
+              encoded = ''.join(part.read_text(encoding='ascii') for part in parts)
+              payload = base64.b64decode(encoded, validate=True)
+              actual_sha = hashlib.sha256(payload).hexdigest()
+              if actual_sha != expected_sha:
+                  raise RuntimeError(f'SHA-256 mismatch for {target_name}: {actual_sha}')
+              target = Path(target_name)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_bytes(payload)
+              print(f'Wrote {target_name} ({len(payload)} bytes)')
+
+          shutil.rmtree(upload_dir)
+          PY
+
+      - name: Commit assembled assets
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add videos/14.mp4 videos/15.mp4 videos/16.mp4 videos/17.mp4
+          git add thumbnails/14_thumb.jpg thumbnails/15_thumb.jpg thumbnails/16_thumb.jpg thumbnails/17_thumb.jpg
+          git add -A .upload
+          git commit -m "Add four portfolio videos [assembled]"
+          git push
