@@ -1,71 +1,63 @@
-name: Assemble portfolio media
+name: Install portfolio media package
 
 on:
   push:
     branches:
       - agent/update-portfolio-videos
     paths:
-      - .upload/READY
+      - portfolio-media.zip
 
 permissions:
   contents: write
 
 jobs:
-  assemble:
-    if: ${{ !contains(github.event.head_commit.message, '[assembled]') }}
+  install:
+    if: ${{ !contains(github.event.head_commit.message, '[installed]') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out branch
+      - name: Check out update branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Rebuild media files
+      - name: Extract and verify media package
         shell: bash
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          import base64
-          import hashlib
-          import shutil
+          set -euo pipefail
+          test -f portfolio-media.zip
+          rm -rf .portfolio-media-stage
+          mkdir .portfolio-media-stage
+          unzip -q portfolio-media.zip -d .portfolio-media-stage
 
-          expected = {
-              'videos/14.mp4': '85c3c822bd2a21be8520dd3de12cd3759f15e3293af9394e34700871fc73eb65',
-              'videos/15.mp4': '33fa1db1e30f6d3c0792848339181b6115527709a64ce494b3a786ecf0f05921',
-              'videos/16.mp4': '02dfb1aea3cf3c0caf4e626fa86468d93e145f7bd788de0a74405e08e1095e13',
-              'videos/17.mp4': '35ed06be4aaf7155350adac118a264045ae3cbe4afa24b61fc01fffbb9be349e',
-              'thumbnails/14_thumb.jpg': '1bf7a0514d52fae57e7068e3c55ca82327653b9019d4eee129516d725776a11d',
-              'thumbnails/15_thumb.jpg': '8f6afb05a2e4e969096320ee8a4bfea4f1f4a4b24d5acd9d2af1878a15cdd72c',
-              'thumbnails/16_thumb.jpg': '66cdb7ab4552941ad0f1db8e52f87950c24260c4e1dff468abd1b4c3515d9f50',
-              'thumbnails/17_thumb.jpg': '21a59a42957b11b00ea20a53d44dfa50d039d055a0cfa64d910dcea6c40944af',
-          }
+          cd .portfolio-media-stage
+          sha256sum -c SHA256SUMS.txt
 
-          upload_dir = Path('.upload')
-          for target_name, expected_sha in expected.items():
-              key = target_name.replace('/', '__')
-              parts = sorted(upload_dir.glob(f'{key}.part*'))
-              if not parts:
-                  raise RuntimeError(f'Missing upload chunks for {target_name}')
-              encoded = ''.join(part.read_text(encoding='ascii') for part in parts)
-              payload = base64.b64decode(encoded, validate=True)
-              actual_sha = hashlib.sha256(payload).hexdigest()
-              if actual_sha != expected_sha:
-                  raise RuntimeError(f'SHA-256 mismatch for {target_name}: {actual_sha}')
-              target = Path(target_name)
-              target.parent.mkdir(parents=True, exist_ok=True)
-              target.write_bytes(payload)
-              print(f'Wrote {target_name} ({len(payload)} bytes)')
+          for file in videos/1.mp4 videos/14.mp4 videos/15.mp4 videos/16.mp4; do
+            ffprobe -v error -select_streams v:0 \
+              -show_entries stream=codec_name,pix_fmt,width,height \
+              -of default=noprint_wrappers=1 "$file"
+          done
+          cd ..
 
-          shutil.rmtree(upload_dir)
-          PY
+          mkdir -p videos thumbnails
+          cp .portfolio-media-stage/videos/1.mp4 videos/1.mp4
+          cp .portfolio-media-stage/videos/14.mp4 videos/14.mp4
+          cp .portfolio-media-stage/videos/15.mp4 videos/15.mp4
+          cp .portfolio-media-stage/videos/16.mp4 videos/16.mp4
+          cp .portfolio-media-stage/thumbnails/1_thumb.jpg thumbnails/1_thumb.jpg
+          cp .portfolio-media-stage/thumbnails/14_thumb.jpg thumbnails/14_thumb.jpg
+          cp .portfolio-media-stage/thumbnails/15_thumb.jpg thumbnails/15_thumb.jpg
+          cp .portfolio-media-stage/thumbnails/16_thumb.jpg thumbnails/16_thumb.jpg
+          rm -rf .portfolio-media-stage portfolio-media.zip
 
-      - name: Commit assembled assets
+      - name: Commit installed media
         shell: bash
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add videos/14.mp4 videos/15.mp4 videos/16.mp4 videos/17.mp4
-          git add thumbnails/14_thumb.jpg thumbnails/15_thumb.jpg thumbnails/16_thumb.jpg thumbnails/17_thumb.jpg
-          git add -A .upload
-          git commit -m "Add four portfolio videos [assembled]"
+          git add videos/1.mp4 videos/14.mp4 videos/15.mp4 videos/16.mp4
+          git add thumbnails/1_thumb.jpg thumbnails/14_thumb.jpg thumbnails/15_thumb.jpg thumbnails/16_thumb.jpg
+          git add -A portfolio-media.zip
+          git commit -m "Install optimized portfolio videos [installed]"
           git push
