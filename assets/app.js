@@ -6,6 +6,8 @@
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   const saveData = Boolean(connection?.saveData);
   const slowConnection = ['slow-2g', '2g', '3g'].includes(connection?.effectiveType);
+  const assetCdn = String(window.MOTION_ASSET_CDN || '').trim().replace(/\/+$/, '');
+  const assetVersion = String(window.MOTION_ASSET_VERSION || '').trim();
 
   const gallery = document.getElementById('gallery');
   const emptyState = document.getElementById('emptyState');
@@ -36,8 +38,34 @@
   let touchStartX = 0;
   let touchStartY = 0;
   let loadTimeout = null;
+  let currentVideoSources = [];
+  let currentVideoSourceIndex = 0;
 
   headerCount.textContent = `${String(works.length).padStart(2, '0')} FILMS`;
+
+  function localAssetUrl(path) {
+    try {
+      return new URL(String(path || ''), document.baseURI).href;
+    } catch {
+      return String(path || '');
+    }
+  }
+
+  function cdnAssetUrl(path) {
+    if (!assetCdn || !path) return '';
+    const cleanPath = String(path).replace(/^\/+/, '');
+    try {
+      const url = new URL(`${assetCdn}/${cleanPath}`);
+      if (assetVersion) url.searchParams.set('v', assetVersion);
+      return url.href;
+    } catch {
+      return '';
+    }
+  }
+
+  function assetCandidates(path) {
+    return [...new Set([cdnAssetUrl(path), localAssetUrl(path)].filter(Boolean))];
+  }
 
   function escapeHtml(value) {
     return String(value ?? '')
@@ -52,10 +80,13 @@
     const number = String(work.id).padStart(2, '0');
     const eager = index < 3;
     const highPriority = index === 0;
+    // Keep the small poster files same-origin for reliable offline fallback;
+    // the much heavier MP4 is routed through the edge cache below.
+    const thumbnail = work.thumbnail;
     return `
       <button class="work-card work-card--${escapeHtml(work.orientation)}" type="button" data-id="${Number(work.id)}" aria-label="播放 ${escapeHtml(work.title)}">
         <span class="work-card__media">
-          <img class="work-card__image" src="${escapeHtml(work.thumbnail)}" alt="${escapeHtml(work.title)} 视频封面" loading="${eager ? 'eager' : 'lazy'}" fetchpriority="${highPriority ? 'high' : 'auto'}" decoding="async">
+          <img class="work-card__image" src="${escapeHtml(thumbnail)}" alt="${escapeHtml(work.title)} 视频封面" loading="${eager ? 'eager' : 'lazy'}" fetchpriority="${highPriority ? 'high' : 'auto'}" decoding="async">
           <span class="work-card__duration">${escapeHtml(work.duration)}s</span>
           <span class="work-card__play" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -95,6 +126,12 @@
       const workId = Number(card.dataset.id);
       const work = works.find(item => item.id === workId);
       card.addEventListener('click', () => openPlayer(workId));
+      const image = card.querySelector('.work-card__image');
+      image?.addEventListener('error', () => {
+        if (image.dataset.fallbackUsed === 'true') return;
+        image.dataset.fallbackUsed = 'true';
+        image.src = localAssetUrl(work?.thumbnail);
+      }, { once: true });
       card.style.transitionDelay = prefersReducedMotion ? '0ms' : `${Math.min(index * 35, 280)}ms`;
       cardObserver ? cardObserver.observe(card) : card.classList.add('is-visible');
     });
@@ -136,6 +173,8 @@
     mainVideo.pause();
     mainVideo.removeAttribute('src');
     mainVideo.load();
+    currentVideoSources = [];
+    currentVideoSourceIndex = 0;
   }
 
   function closePlayer() {
@@ -165,8 +204,11 @@
     playerError.hidden = true;
     mainVideo.pause();
     mainVideo.removeAttribute('src');
-    mainVideo.poster = work.thumbnail;
-    mainVideo.src = work.video;
+    currentVideoSources = assetCandidates(work.video);
+    currentVideoSourceIndex = 0;
+    mainVideo.poster = localAssetUrl(work.thumbnail);
+    mainVideo.src = currentVideoSources[0] || localAssetUrl(work.video);
+    mainVideo.dataset.sourceOrigin = currentVideoSourceIndex === 0 && assetCdn ? 'edge-cache' : 'site';
     playerStage.classList.toggle('is-portrait', work.orientation === 'portrait');
     playerTitle.textContent = work.title;
     playerIndex.textContent = `FILM ${String(work.id).padStart(2, '0')} / ${String(works.length).padStart(2, '0')}`;
@@ -184,6 +226,20 @@
     }
   }
 
+  function retryFromNextVideoSource() {
+    if (currentVideoSourceIndex >= currentVideoSources.length - 1) {
+      showLoadError();
+      return;
+    }
+    currentVideoSourceIndex += 1;
+    playerLoading.classList.remove('is-hidden');
+    playerError.hidden = true;
+    mainVideo.src = currentVideoSources[currentVideoSourceIndex];
+    mainVideo.dataset.sourceOrigin = 'site';
+    mainVideo.load();
+    loadTimeout = window.setTimeout(showLoadError, slowConnection ? 45000 : 30000);
+  }
+
   function stepPlayer(step) {
     currentIndex = (currentIndex + step + works.length) % works.length;
     loadCurrentWork(step);
@@ -199,7 +255,7 @@
     clearTimeout(loadTimeout);
     playerLoading.classList.add('is-hidden');
   });
-  mainVideo.addEventListener('error', showLoadError);
+  mainVideo.addEventListener('error', retryFromNextVideoSource);
 
   playerRetry.addEventListener('click', () => loadCurrentWork());
   playerClose.addEventListener('click', closePlayer);
