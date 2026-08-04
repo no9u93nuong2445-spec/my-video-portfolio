@@ -2,7 +2,7 @@
 // The player keeps a same-origin fallback so the gallery still works if the
 // CDN is unavailable or a visitor is offline from that edge.
 window.MOTION_ASSET_CDN = 'https://cdn.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/';
-window.MOTION_ASSET_VERSION = '20260805-1';
+window.MOTION_ASSET_VERSION = '20260805-2';
 
 window.MOTION_WORKS = [
   { id: 1, title: '檐下听雨', subtitle: '电影感叙事短片', duration: '27.5', orientation: 'landscape', resolution: '1280×544', video: 'videos/1.mp4', thumbnail: 'thumbnails/1_thumb.jpg' },

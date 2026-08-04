@@ -195,6 +195,17 @@
     playerError.hidden = false;
   }
 
+  function scheduleLoadTimeout() {
+    clearTimeout(loadTimeout);
+    loadTimeout = window.setTimeout(() => {
+      if (currentVideoSourceIndex < currentVideoSources.length - 1) {
+        retryFromNextVideoSource();
+      } else {
+        showLoadError();
+      }
+    }, slowConnection ? 35000 : 18000);
+  }
+
   function loadCurrentWork(direction = 0) {
     const work = works[currentIndex];
     if (!work) return;
@@ -216,7 +227,7 @@
     playerFormat.textContent = `${work.orientation.toUpperCase()} · ${work.resolution}`;
     mainVideo.load();
 
-    loadTimeout = window.setTimeout(showLoadError, slowConnection ? 45000 : 30000);
+    scheduleLoadTimeout();
 
     if (direction !== 0 && !prefersReducedMotion) {
       playerStage.animate([
@@ -227,6 +238,7 @@
   }
 
   function retryFromNextVideoSource() {
+    if (!player.classList.contains('is-open') || !currentVideoSources.length) return;
     if (currentVideoSourceIndex >= currentVideoSources.length - 1) {
       showLoadError();
       return;
@@ -237,7 +249,7 @@
     mainVideo.src = currentVideoSources[currentVideoSourceIndex];
     mainVideo.dataset.sourceOrigin = 'site';
     mainVideo.load();
-    loadTimeout = window.setTimeout(showLoadError, slowConnection ? 45000 : 30000);
+    scheduleLoadTimeout();
   }
 
   function stepPlayer(step) {
