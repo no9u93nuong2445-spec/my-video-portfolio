@@ -29,6 +29,19 @@ jobs:
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
           fetch-depth: 0
 
+      - name: Check existing lightweight copies
+        id: lite
+        shell: bash
+        run: |
+          set -euo pipefail
+          count="$(find videos-lite -maxdepth 1 -type f -name '*.mp4' 2>/dev/null | wc -l | tr -d ' ')"
+          if [ "$count" = "16" ] && [ -f videos-lite/MANIFEST.txt ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "16 lightweight videos already exist; verification only."
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Ensure ffmpeg is available
         shell: bash
         run: |
@@ -40,6 +53,7 @@ jobs:
           ffmpeg -version | head -n 1
 
       - name: Build low-bandwidth MP4 copies
+        if: ${{ steps.lite.outputs.ready != 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -66,7 +80,7 @@ jobs:
             sha256sum videos-lite/*.mp4
           } > videos-lite/MANIFEST.txt
 
-      - name: Verify generated videos
+      - name: Verify lightweight videos
         shell: bash
         run: |
           set -euo pipefail
@@ -77,7 +91,17 @@ jobs:
               -of default=noprint_wrappers=1 "$file"
           done
 
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check assets/app.js
+          node --check assets/data.js
+          node --check assets/resilience.js
+          node --check service-worker.js
+
       - name: Commit lightweight copies
+        if: ${{ steps.lite.outputs.ready != 'true' }}
         shell: bash
         run: |
           set -euo pipefail
