@@ -19,12 +19,14 @@
   <meta name="twitter:image" content="https://works.devs.surf/thumbnails/1_thumb.jpg">
   <link rel="canonical" href="https://works.devs.surf/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="//fastly.jsdelivr.net">
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
   <link rel="preload" href="thumbnails/1_thumb.jpg" as="image" fetchpriority="high">
-  <link rel="stylesheet" href="assets/styles.css?v=20260805-2">
-  <link rel="stylesheet" href="assets/resilience.css?v=20260805-2">
-  <link rel="stylesheet" href="assets/gallery.css?v=20260805-2">
+  <link rel="stylesheet" href="assets/styles.css?v=20260809-1">
+  <link rel="stylesheet" href="assets/resilience.css?v=20260809-1">
+  <link rel="stylesheet" href="assets/gallery.css?v=20260809-1">
   <title>精选动态作品｜AI 视频作品集</title>
 </head>
 <body>
@@ -83,13 +85,13 @@
       <div class="player__stage" id="playerStage">
         <div class="player__loading" id="playerLoading" aria-live="polite">
           <span></span>
-          <p>LOADING FILM</p>
+          <p id="playerLoadingText">准备视频线路</p>
         </div>
         <video id="mainVideo" controls playsinline webkit-playsinline preload="metadata"></video>
         <div class="player__error" id="playerError" role="status" hidden>
-          <p>视频加载较慢或连接失败。</p>
+          <p>当前线路加载较慢或连接失败。</p>
           <div class="player__actions">
-            <button id="playerRetry" type="button">重新加载</button>
+            <button id="playerRetry" type="button">重新测速</button>
             <a id="playerOpenExternal" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">单独打开视频</a>
           </div>
         </div>
@@ -102,6 +104,7 @@
         <div class="player__meta">
           <span id="playerDuration">27.5 SEC</span>
           <span id="playerFormat">LANDSCAPE</span>
+          <button class="player__quality" id="playerQuality" type="button">流畅</button>
         </div>
         <button class="player-nav player-nav--next" id="playerNext" type="button" aria-label="播放下一个作品">
           <small>NEXT</small><span>→</span>
@@ -111,8 +114,8 @@
   </div>
 
   <noscript><div class="noscript">请启用 JavaScript 以浏览和播放作品。</div></noscript>
-  <script src="assets/data.js?v=20260805-2" defer></script>
-  <script src="assets/app.js?v=20260805-2" defer></script>
-  <script src="assets/resilience.js?v=20260805-2" defer></script>
+  <script src="assets/data.js?v=20260809-1" defer></script>
+  <script src="assets/app.js?v=20260809-1" defer></script>
+  <script src="assets/resilience.js?v=20260809-1" defer></script>
 </body>
 </html>
