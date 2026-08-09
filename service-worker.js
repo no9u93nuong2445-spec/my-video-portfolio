@@ -1,17 +1,17 @@
 'use strict';
 
 const CACHE_PREFIX = 'motion-gallery-';
-const CACHE_NAME = `${CACHE_PREFIX}2026-08-05-v2`;
+const CACHE_NAME = `${CACHE_PREFIX}2026-08-09-v1`;
 const CORE_ASSETS = [
   './',
   './index.html',
   './favicon.svg',
-  './assets/styles.css?v=20260805-2',
-  './assets/resilience.css?v=20260805-2',
-  './assets/gallery.css?v=20260805-2',
-  './assets/data.js?v=20260805-2',
-  './assets/app.js?v=20260805-2',
-  './assets/resilience.js?v=20260805-2',
+  './assets/styles.css?v=20260809-1',
+  './assets/resilience.css?v=20260809-1',
+  './assets/gallery.css?v=20260809-1',
+  './assets/data.js?v=20260809-1',
+  './assets/app.js?v=20260809-1',
+  './assets/resilience.js?v=20260809-1',
   './thumbnails/1_thumb.jpg'
 ];
 
@@ -36,7 +36,7 @@ self.addEventListener('activate', event => {
 function isVideoRequest(request, url) {
   return request.destination === 'video' ||
     request.headers.has('range') ||
-    /\/(videos|previews)\//i.test(url.pathname) ||
+    /\/(videos|videos-lite|previews)\//i.test(url.pathname) ||
     /\.(mp4|webm|mov|m3u8)(?:$|\?)/i.test(url.href);
 }
 

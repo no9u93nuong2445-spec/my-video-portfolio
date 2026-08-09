@@ -1,0 +1,118 @@
+name: Build lightweight playback copies
+
+on:
+  push:
+    branches:
+      - agent/mainland-playback-v22
+    paths:
+      - .lite-build-trigger
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: write
+
+jobs:
+  build-lite:
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[lite-built]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out update branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Check existing lightweight copies
+        id: lite
+        shell: bash
+        run: |
+          set -euo pipefail
+          count="$(find videos-lite -maxdepth 1 -type f -name '*.mp4' 2>/dev/null | wc -l | tr -d ' ')"
+          if [ "$count" = "16" ] && [ -f videos-lite/MANIFEST.txt ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "16 lightweight videos already exist; verification only."
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ensure ffmpeg is available
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+
+      - name: Build low-bandwidth MP4 copies
+        if: ${{ steps.lite.outputs.ready != 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf videos-lite
+          mkdir -p videos-lite
+
+          for src in videos/*.mp4; do
+            name="$(basename "$src")"
+            out="videos-lite/$name"
+            echo "Encoding $src -> $out"
+            ffmpeg -hide_banner -loglevel error -y -i "$src" \
+              -vf "scale=w='if(gt(iw,ih),min(854,iw),-2)':h='if(gt(iw,ih),-2,min(854,ih))',fps=24" \
+              -c:v libx264 -preset veryfast -profile:v main -level 3.1 \
+              -crf 29 -maxrate 650k -bufsize 1300k \
+              -g 48 -keyint_min 48 -sc_threshold 0 \
+              -c:a aac -b:a 64k -ac 2 \
+              -movflags +faststart "$out"
+          done
+
+          {
+            echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "count=$(find videos-lite -maxdepth 1 -type f -name '*.mp4' | wc -l)"
+            du -ch videos-lite/*.mp4 | tail -n 1
+            sha256sum videos-lite/*.mp4
+          } > videos-lite/MANIFEST.txt
+
+      - name: Verify lightweight videos
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find videos-lite -maxdepth 1 -type f -name '*.mp4' | wc -l)" -eq 16
+          for file in videos-lite/*.mp4; do
+            ffprobe -v error -select_streams v:0 \
+              -show_entries stream=codec_name,pix_fmt,width,height,r_frame_rate \
+              -of default=noprint_wrappers=1 "$file"
+          done
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check assets/app.js
+          node --check assets/data.js
+          node --check assets/resilience.js
+          node --check service-worker.js
+
+      - name: Commit lightweight copies
+        if: ${{ steps.lite.outputs.ready != 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .lite-build-trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A videos-lite .lite-build-trigger
+          if git diff --cached --quiet; then
+            echo "No lightweight media changes to commit."
+            exit 0
+          fi
+          git commit -m "Add lightweight playback copies [lite-built]"
+          TARGET_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          git push origin "HEAD:${TARGET_BRANCH}"
