@@ -6,19 +6,27 @@ on:
       - agent/mainland-playback-v22
     paths:
       - .lite-build-trigger
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 permissions:
   contents: write
 
 jobs:
   build-lite:
-    if: ${{ !contains(github.event.head_commit.message, '[lite-built]') }}
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[lite-built]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - name: Check out branch
+      - name: Check out update branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Ensure ffmpeg is available
@@ -77,5 +85,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A videos-lite .lite-build-trigger
+          if git diff --cached --quiet; then
+            echo "No lightweight media changes to commit."
+            exit 0
+          fi
           git commit -m "Add lightweight playback copies [lite-built]"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          TARGET_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          git push origin "HEAD:${TARGET_BRANCH}"
