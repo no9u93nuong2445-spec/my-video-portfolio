@@ -1,7 +1,0 @@
-## What changed
-
-- 
-
-## Validation
-
-- 
