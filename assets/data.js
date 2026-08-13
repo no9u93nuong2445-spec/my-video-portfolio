@@ -5,11 +5,11 @@ window.MOTION_ASSET_CDNS = [
   { name: 'fastly', base: 'https://fastly.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/' },
   { name: 'jsdelivr', base: 'https://cdn.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/' }
 ];
-window.MOTION_ASSET_VERSION = '20260813-2';
+window.MOTION_ASSET_VERSION = '20260814-1';
 window.MOTION_DEFAULT_QUALITY = 'smooth';
 
 window.MOTION_WORKS = [
-  { id: 1, title: '檐下听雨', subtitle: '电影感叙事短片', duration: '27.5', orientation: 'landscape', resolution: '1280×544', video: 'videos/1.mp4', thumbnail: 'thumbnails/1_thumb_v2.jpg?v=20260813-2' },
+  { id: 1, title: '檐下听雨', subtitle: '电影感叙事短片', duration: '27.5', orientation: 'landscape', resolution: '1280×544', video: 'videos/1.mp4', thumbnail: 'thumbnails/1_thumb_v3.svg?v=20260814-1' },
   { id: 2, title: '轻商务口播', subtitle: 'AI 数字人口播', duration: '30.1', orientation: 'portrait', resolution: '720×1280', video: 'videos/2.mp4', thumbnail: 'thumbnails/2_thumb.jpg' },
   { id: 3, title: '产品开箱', subtitle: '商品视觉短片', duration: '15.1', orientation: 'portrait', resolution: '720×1280', video: 'videos/3.mp4', thumbnail: 'thumbnails/3_thumb.jpg' },
   { id: 4, title: '城市轻装', subtitle: '男装动态展示', duration: '30.2', orientation: 'portrait', resolution: '720×1280', video: 'videos/4.mp4', thumbnail: 'thumbnails/4_thumb.jpg' },
