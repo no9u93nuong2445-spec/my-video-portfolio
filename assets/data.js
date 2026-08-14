@@ -24,7 +24,7 @@ window.MOTION_WORKS = [
   { id: 13, title: '烟雨江南', subtitle: '国风氛围短片', duration: '15.0', orientation: 'portrait', resolution: '720×1280', video: 'videos/14.mp4', thumbnail: 'thumbnails/14_thumb.jpg' },
   { id: 14, title: '夜色香氛', subtitle: '香水广告概念片', duration: '15.9', orientation: 'portrait', resolution: '720×1280', video: 'videos/15.mp4', thumbnail: 'thumbnails/15_thumb.jpg' },
   { id: 15, title: '电梯来电', subtitle: '都市悬疑叙事', duration: '40.0', orientation: 'portrait', resolution: '720×1280', video: 'videos/16.mp4', thumbnail: 'thumbnails/16_thumb.jpg' },
-  { id: 16, title: '森息香氛', subtitle: '森系香氛概念片', duration: '56.9', orientation: 'portrait', resolution: '180×320', video: 'videos-lite/17.mp4', thumbnail: 'thumbnails/17_thumb.jpg' },
-  { id: 17, title: '风停以后', subtitle: '海岸情绪叙事', duration: '24.0', orientation: 'landscape', resolution: '288×162', video: 'videos-lite/18.mp4', thumbnail: 'thumbnails/18_thumb.jpg' },
-  { id: 18, title: '云海天境', subtitle: '东方奇幻概念片', duration: '33.8', orientation: 'landscape', resolution: '288×162', video: 'videos-lite/19.mp4', thumbnail: 'thumbnails/19_thumb.jpg' }
+  { id: 16, title: '森息香氛', subtitle: '森系香氛概念片', duration: '56.9', orientation: 'portrait', resolution: '150×266', video: 'videos-lite/17.mp4', thumbnail: 'thumbnails/17_thumb.jpg' },
+  { id: 17, title: '风停以后', subtitle: '海岸情绪叙事', duration: '24.0', orientation: 'landscape', resolution: '240×136', video: 'videos-lite/18.mp4', thumbnail: 'thumbnails/18_thumb.jpg' },
+  { id: 18, title: '云海天境', subtitle: '东方奇幻概念片', duration: '33.8', orientation: 'landscape', resolution: '240×136', video: 'videos-lite/19.mp4', thumbnail: 'thumbnails/19_thumb.jpg' }
 ];
