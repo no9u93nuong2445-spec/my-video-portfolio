@@ -32,9 +32,9 @@ jobs:
           import shutil
 
           expected = {
-              'videos-lite/17.mp4': '42dcc6673948420b2b1f408be5a8605e2b2ee3f9518c0856ef805891be68f6d7',
-              'videos-lite/18.mp4': '65cd9981b9b3ba9aca87d0458d85ea69ac95cd6e126936730ff98ecb865466ce',
-              'videos-lite/19.mp4': '83d1e3ab4d48d4d2b9a7915b38c0f33b20431bd7d3e51ddb0df401140b10909b',
+              'videos-lite/17.mp4': 'd578adbbc9d2a7a2508e8685037e6a1c6d3fb250c9bef51fc99780aaa2f550e2',
+              'videos-lite/18.mp4': '56328b6ea3d44a8b5ecfc0a09bfdeef2c984e96ad84e3e4cbfda9f6033bc7cb9',
+              'videos-lite/19.mp4': '478867f5a2333ad81175ef6de325cff8585bddb84e3aacbeb70ded80ad795c9c',
           }
 
           upload_dir = Path('.upload')
@@ -103,5 +103,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Add three low-bandwidth portfolio videos [assembled]"
+          git commit -m "Add three domestic-first portfolio videos [assembled]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
