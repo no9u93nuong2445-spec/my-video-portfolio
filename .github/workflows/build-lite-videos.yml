@@ -35,9 +35,9 @@ jobs:
         run: |
           set -euo pipefail
           count="$(find videos-lite -maxdepth 1 -type f -name '*.mp4' 2>/dev/null | wc -l | tr -d ' ')"
-          if [ "$count" = "15" ] && [ -f videos-lite/MANIFEST.txt ] && grep -q '^count=15$' videos-lite/MANIFEST.txt; then
+          if [ "$count" = "18" ] && [ -f videos-lite/MANIFEST.txt ] && grep -q '^count=18$' videos-lite/MANIFEST.txt; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
-            echo "15 lightweight videos already exist; verification only."
+            echo "18 lightweight videos already exist; verification only."
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
           fi
@@ -84,7 +84,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(find videos-lite -maxdepth 1 -type f -name '*.mp4' | wc -l | tr -d ' ')" -eq 15
+          test "$(find videos-lite -maxdepth 1 -type f -name '*.mp4' | wc -l | tr -d ' ')" -eq 18
           for file in videos-lite/*.mp4; do
             ffprobe -v error -select_streams v:0 \
               -show_entries stream=codec_name,pix_fmt,width,height,r_frame_rate \
@@ -113,6 +113,6 @@ jobs:
             echo "No lightweight media changes to commit."
             exit 0
           fi
-          git commit -m "Refresh lightweight playback copies for 15 works [lite-built]"
+          git commit -m "Refresh lightweight playback copies for 18 works [lite-built]"
           TARGET_BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
           git push origin "HEAD:${TARGET_BRANCH}"
