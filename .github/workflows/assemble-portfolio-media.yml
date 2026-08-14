@@ -3,7 +3,7 @@ name: Assemble portfolio media
 on:
   push:
     branches:
-      - agent/update-portfolio-videos
+      - agent/add-three-videos-20260815
     paths:
       - .upload/READY
 
@@ -32,10 +32,9 @@ jobs:
           import shutil
 
           expected = {
-              'videos/1.mp4': 'e6c1807a0b58668b871a2cb34bfa8f1d4038c7481dd40c8817f580f74d2a393d',
-              'videos/14.mp4': '1e08d9093c77cee16b3fb646c17c45cc6ed16539841d12e5ca5e91a426664ab0',
-              'videos/15.mp4': '523fee1a719cc2f5750e48ea65684b8e02ba9402b27dfd9d70765f26e6baa44c',
-              'videos/16.mp4': '9f39a565b1d7d84ebc9b97e8d3517b0d468df1e377462708dcdf72092eed8cdd',
+              'videos/17.mp4': 'a230dc7cef6f017825753edce6b6d6c0e12498bbac14461b28b2b7ee0dca4ea2',
+              'videos/18.mp4': 'e44cc88f77d5b004d1827ec3dce3293a83f3b91bf2a48a5a10ae0ce597be1507',
+              'videos/19.mp4': '638d35432f405a32f9c2acc4de5c5a08645ae96d02dfddf9a13d5cc602032969',
           }
 
           upload_dir = Path('.upload')
@@ -69,5 +68,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Add optimized portfolio videos [assembled]"
+          git commit -m "Add three optimized portfolio videos [assembled]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
