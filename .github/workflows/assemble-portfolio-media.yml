@@ -32,9 +32,9 @@ jobs:
           import shutil
 
           expected = {
-              'videos/17.mp4': '21ce62098f1161c6671ba1ca585fd5a2ec73a9026805dfd05715248684471eac',
-              'videos/18.mp4': '0645a540e80e612da80793438bfff5e99b22083b0d92220ba9450279ad364d7d',
-              'videos/19.mp4': 'e907bf4065d112c0e05f23e874c9776d8cd61ffc14e1883bfc5af99044e3b636',
+              'videos/17.mp4': 'c6a817822fdc33ac2b2b354df55d01670a2eaf080d59dffe5dda792017433db3',
+              'videos/18.mp4': '9f6ea8b4ba35d0ec90a62e444a95b2a6440af4bf1e2bbed75b8ca9da8279618b',
+              'videos/19.mp4': 'e6bcd183f525a56ee32ebbc33d34e103db9a4bdef9086170df39e0b5d506c694',
           }
 
           upload_dir = Path('.upload')
