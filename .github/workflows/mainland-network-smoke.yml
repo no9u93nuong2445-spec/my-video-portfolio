@@ -11,7 +11,15 @@ permissions:
   contents: read
 
 jobs:
-  tance-video:
+  tance-cdn-video:
+    strategy:
+      fail-fast: false
+      matrix:
+        route:
+          - name: fastly
+            target: https://fastly.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/videos-lite/18.mp4
+          - name: jsdelivr
+            target: https://cdn.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/videos-lite/18.mp4
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -19,16 +27,18 @@ jobs:
       - name: Prepare headless browser
         shell: bash
         run: python -m pip install --disable-pip-version-check --quiet selenium
-      - name: Probe smooth video from mainland nodes
+      - name: Probe CDN smooth video from mainland nodes
         shell: bash
+        env:
+          TARGET: ${{ matrix.route.target }}
+          ROUTE_NAME: ${{ matrix.route.name }}
         run: |
           python - <<'PY'
-          import time
+          import os, time
           from selenium import webdriver
           from selenium.webdriver.common.by import By
           from selenium.webdriver.chrome.options import Options
-
-          TARGET='https://works.devs.surf/videos-lite/18.mp4'
+          TARGET=os.environ['TARGET']; ROUTE=os.environ['ROUTE_NAME']
           opts=Options(); opts.page_load_strategy='eager'
           for a in ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1440,1800','--lang=zh-CN']:
               opts.add_argument(a)
@@ -36,54 +46,50 @@ jobs:
           d=webdriver.Chrome(options=opts); d.set_page_load_timeout(40)
           try:
               try: d.get('https://www.tance.cc/')
-              except Exception as e:
-                  print('page-load warning',type(e).__name__,str(e)[:160]); d.execute_script('window.stop()')
+              except Exception:
+                  try: d.execute_script('window.stop()')
+                  except Exception: pass
               time.sleep(6)
               for el in d.find_elements(By.XPATH,"//*[normalize-space(text())='网站测速']"):
-                  if el.is_displayed():
-                      d.execute_script('arguments[0].click()',el); time.sleep(2); break
-              target_input=None
+                  if el.is_displayed(): d.execute_script('arguments[0].click()',el); time.sleep(2); break
+              inp=None
               for el in d.find_elements(By.CSS_SELECTOR,'input'):
                   ph=(el.get_attribute('placeholder') or '')
-                  if el.is_displayed() and ('域名' in ph or 'IP' in ph): target_input=el; break
-              if not target_input: raise RuntimeError('target input missing')
-              target_input.clear(); target_input.send_keys(TARGET)
-              print('input-value=',target_input.get_attribute('value'))
+                  if el.is_displayed() and ('域名' in ph or 'IP' in ph): inp=el; break
+              if not inp: raise RuntimeError('target input missing')
+              inp.clear(); inp.send_keys(TARGET)
               clicked=False
               for text in ('检测','单次检测','开始检测'):
                   for el in d.find_elements(By.XPATH,f"//*[normalize-space(text())='{text}']"):
                       if el.is_displayed(): d.execute_script('arguments[0].click()',el); clicked=True; break
                   if clicked: break
               if not clicked: raise RuntimeError('submit missing')
-              # Result rows stream quickly; wait until carrier summary and many node rows appear.
-              deadline=time.time()+180
-              body=''
+              deadline=time.time()+180; body=''
               while time.time()<deadline:
                   time.sleep(4); body=d.find_element(By.TAG_NAME,'body').text
                   nodes=sum(1 for line in body.splitlines() if line.strip().startswith(('电信','联通','移动')))
                   if nodes>=30 and all(k in body for k in ('中国电信','中国联通','中国移动')):
                       time.sleep(5); break
               lines=[x.strip() for x in body.splitlines() if x.strip()]
-              print('=== PAGE HEAD AFTER PROBE ===')
-              for line in lines[:60]: print(line)
+              print('=== ROUTE ===',ROUTE)
+              print('=== TARGET ===',TARGET)
               print('=== CARRIER SUMMARY ===')
               for isp in ('中国电信','中国移动','中国联通'):
                   try:
-                      i=lines.index(isp); print(isp, ' | '.join(lines[i:i+3]))
+                      i=lines.index(isp); print(isp,' | '.join(lines[i:i+4]))
                   except ValueError: print(isp,'NOT FOUND')
-              print('=== RESULT TABLE ROWS ===')
+              print('=== RESULT ROWS ===')
               rows=[]
               for tr in d.find_elements(By.CSS_SELECTOR,'tr'):
                   txt=' '.join((tr.text or '').split())
-                  if txt and any(x in txt for x in ('电信','联通','移动')):
-                      rows.append(txt)
+                  if txt and any(x in txt for x in ('电信','联通','移动')): rows.append(txt)
               for row in rows[:160]: print(row)
               print('row-count=',len(rows))
-              print('=== BODY STATUS TOKENS ===')
-              for token in ('200','206','超时','失败','成功','错误'):
-                  print(token, body.count(token))
-              if not all(k in body for k in ('中国电信','中国联通','中国移动')):
-                  raise RuntimeError('no valid three-carrier result')
+              print('status-200=',sum(' 200 ' in (' '+r+' ') for r in rows))
+              print('status-206=',sum(' 206 ' in (' '+r+' ') for r in rows))
+              print('failed-rows=',sum(('失败' in r or '解析失败' in r) for r in rows))
+              print('ten-second-rows=',sum(('10.000s' in r or '10.001s' in r or '10.002s' in r) for r in rows))
+              if not all(k in body for k in ('中国电信','中国联通','中国移动')): raise RuntimeError('no valid three-carrier result')
           finally:
               d.quit()
           PY
