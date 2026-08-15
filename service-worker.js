@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'motion-gallery-';
-const CACHE_NAME = `${CACHE_PREFIX}2026-08-15-v4`;
+const CACHE_NAME = `${CACHE_PREFIX}2026-08-15-v5`;
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -9,7 +9,7 @@ const CORE_ASSETS = [
   './assets/styles.css?v=20260815-4',
   './assets/resilience.css?v=20260815-4',
   './assets/gallery.css?v=20260815-4',
-  './assets/data.js?v=20260815-4',
+  './assets/data.js?v=20260815-5',
   './assets/app.js?v=20260815-4',
   './assets/resilience.js?v=20260815-4',
   './thumbnails/19_thumb.jpg?v=20260815-4',
