@@ -5,7 +5,7 @@ on:
     branches:
       - agent/add-three-videos-20260815
     paths:
-      - .upload/READY
+      - portfolio-three-videos-bundle.zip
 
 permissions:
   contents: write
@@ -14,54 +14,44 @@ jobs:
   assemble:
     if: ${{ !contains(github.event.head_commit.message, '[assembled]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - name: Check out update branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Rebuild and verify media files
+      - name: Verify upload bundle
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          import base64
-          import hashlib
-          import shutil
+          test -s portfolio-three-videos-bundle.zip
+          echo "29124a7796f60c97034602dd2015ca162ad5fbda54f4d1b08164551463bc314e  portfolio-three-videos-bundle.zip" | sha256sum -c -
 
-          expected = {
-              'videos-lite/17.mp4': 'd578adbbc9d2a7a2508e8685037e6a1c6d3fb250c9bef51fc99780aaa2f550e2',
-              'videos-lite/18.mp4': '56328b6ea3d44a8b5ecfc0a09bfdeef2c984e96ad84e3e4cbfda9f6033bc7cb9',
-              'videos-lite/19.mp4': '478867f5a2333ad81175ef6de325cff8585bddb84e3aacbeb70ded80ad795c9c',
-          }
+      - name: Unpack and verify HD media
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .media-staging
+          mkdir -p .media-staging
+          unzip -q portfolio-three-videos-bundle.zip -d .media-staging
 
-          upload_dir = Path('.upload')
-          if not (upload_dir / 'READY').is_file():
-              raise RuntimeError('Missing .upload/READY marker')
+          echo "31ad17227502fcd56da4b29eee22528708633cb933ff212201366659f67c72d2  .media-staging/17.mp4" | sha256sum -c -
+          echo "7709727881db9538d2cbfb0d0b4d68103b2f39a1c7998be5b76922dc32445e3a  .media-staging/18.mp4" | sha256sum -c -
+          echo "2aa7aa3f5f03da1c2f7fb9c69cd9085d436659ed62c3e8f14c8b81f5c921aa86  .media-staging/19.mp4" | sha256sum -c -
+          echo "9b40fb1c549a824e2c1ed46c33ce51eedab11cc2afd15a5df6f2303eac694e74  .media-staging/17_thumb.jpg" | sha256sum -c -
+          echo "6c4e5cb1050b0bde33c6a83b8c886c71ad9c403acfd8f65562ed063f555e5684  .media-staging/18_thumb.jpg" | sha256sum -c -
+          echo "28e26182d33b6e9d84b52eaddc4874ea1b0941a39def8214e390f382fd467c76  .media-staging/19_thumb.jpg" | sha256sum -c -
 
-          for target_name, expected_sha in expected.items():
-              key = target_name.replace('/', '__')
-              parts = sorted(upload_dir.glob(f'{key}.part*'))
-              if not parts:
-                  raise RuntimeError(f'Missing upload chunks for {target_name}')
-              encoded = ''.join(part.read_text(encoding='ascii') for part in parts)
-              payload = base64.b64decode(encoded, validate=True)
-              actual_sha = hashlib.sha256(payload).hexdigest()
-              if actual_sha != expected_sha:
-                  raise RuntimeError(
-                      f'SHA-256 mismatch for {target_name}: {actual_sha} != {expected_sha}'
-                  )
-              target = Path(target_name)
-              target.parent.mkdir(parents=True, exist_ok=True)
-              target.write_bytes(payload)
-              print(f'Wrote {target_name} ({len(payload)} bytes)')
+          mkdir -p videos videos-lite thumbnails
+          install -m 0644 .media-staging/17.mp4 videos/17.mp4
+          install -m 0644 .media-staging/18.mp4 videos/18.mp4
+          install -m 0644 .media-staging/19.mp4 videos/19.mp4
+          install -m 0644 .media-staging/17_thumb.jpg thumbnails/17_thumb.jpg
+          install -m 0644 .media-staging/18_thumb.jpg thumbnails/18_thumb.jpg
+          install -m 0644 .media-staging/19_thumb.jpg thumbnails/19_thumb.jpg
 
-          shutil.rmtree(upload_dir)
-          PY
-
-      - name: Generate thumbnails from new videos
+      - name: Ensure ffmpeg is available
         shell: bash
         run: |
           set -euo pipefail
@@ -69,21 +59,34 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y ffmpeg
           fi
-          mkdir -p thumbnails
-          ffmpeg -hide_banner -loglevel error -y -ss 5 -i videos-lite/17.mp4 -frames:v 1 -vf "scale=360:-2" -q:v 5 thumbnails/17_thumb.jpg
-          ffmpeg -hide_banner -loglevel error -y -ss 5 -i videos-lite/18.mp4 -frames:v 1 -vf "scale=480:-2" -q:v 5 thumbnails/18_thumb.jpg
-          ffmpeg -hide_banner -loglevel error -y -ss 5 -i videos-lite/19.mp4 -frames:v 1 -vf "scale=480:-2" -q:v 5 thumbnails/19_thumb.jpg
-          test -s thumbnails/17_thumb.jpg
-          test -s thumbnails/18_thumb.jpg
-          test -s thumbnails/19_thumb.jpg
+          ffmpeg -version | head -n 1
 
-      - name: Verify MP4 metadata
+      - name: Build smooth copies
         shell: bash
         run: |
           set -euo pipefail
-          for file in videos-lite/17.mp4 videos-lite/18.mp4 videos-lite/19.mp4; do
-            ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,pix_fmt,width,height,r_frame_rate -of default=noprint_wrappers=1 "$file"
+          for n in 17 18 19; do
+            src="videos/${n}.mp4"
+            out="videos-lite/${n}.mp4"
+            ffmpeg -hide_banner -loglevel error -y -i "$src" \
+              -vf "scale=w='if(gt(iw,ih),min(854,iw),-2)':h='if(gt(iw,ih),-2,min(854,ih))',fps=24" \
+              -c:v libx264 -preset veryfast -profile:v main -level 3.1 \
+              -crf 29 -maxrate 650k -bufsize 1300k \
+              -pix_fmt yuv420p -g 48 -keyint_min 48 -sc_threshold 0 \
+              -c:a aac -b:a 64k -ac 2 -movflags +faststart "$out"
           done
+
+      - name: Verify all new media
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in videos/17.mp4 videos/18.mp4 videos/19.mp4 videos-lite/17.mp4 videos-lite/18.mp4 videos-lite/19.mp4; do
+            ffprobe -v error -select_streams v:0 \
+              -show_entries stream=codec_name,pix_fmt,width,height,r_frame_rate \
+              -show_entries format=duration \
+              -of default=noprint_wrappers=1 "$file"
+          done
+          test "$(find videos-lite -maxdepth 1 -type f -name '*.mp4' | wc -l | tr -d ' ')" -eq 18
 
       - name: Refresh lightweight manifest
         shell: bash
@@ -91,17 +94,31 @@ jobs:
           set -euo pipefail
           {
             echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "count=$(find videos-lite -maxdepth 1 -type f -name '*.mp4' | wc -l)"
+            echo "count=$(find videos-lite -maxdepth 1 -type f -name '*.mp4' | wc -l | tr -d ' ')"
             du -ch videos-lite/*.mp4 | tail -n 1
             sha256sum videos-lite/*.mp4
           } > videos-lite/MANIFEST.txt
+
+      - name: Validate site code
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check assets/app.js
+          node --check assets/data.js
+          node --check assets/resilience.js
+          node --check service-worker.js
 
       - name: Commit assembled media
         shell: bash
         run: |
           set -euo pipefail
+          rm -rf .media-staging .upload portfolio-three-videos-bundle.zip
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Add three domestic-first portfolio videos [assembled]"
+          if git diff --cached --quiet; then
+            echo "No media changes to commit."
+            exit 0
+          fi
+          git commit -m "Add three portfolio videos with HD and smooth playback [assembled]"
           git push origin "HEAD:${GITHUB_REF_NAME}"
