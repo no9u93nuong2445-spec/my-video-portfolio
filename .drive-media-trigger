@@ -1,3 +1,4 @@
-trigger=2026-08-15T20:45+08:00
+trigger=2026-08-15T20:47+08:00
 source=google-drive
 file_id=1bPgCKtjFP1JlPfOOib3d830sdzBgnsZv
+retry=2
