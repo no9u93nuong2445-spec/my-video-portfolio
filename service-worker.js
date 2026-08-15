@@ -1,18 +1,18 @@
 'use strict';
 
 const CACHE_PREFIX = 'motion-gallery-';
-const CACHE_NAME = `${CACHE_PREFIX}2026-08-15-v2`;
+const CACHE_NAME = `${CACHE_PREFIX}2026-08-15-v3`;
 const CORE_ASSETS = [
   './',
   './index.html',
   './favicon.svg',
-  './assets/styles.css?v=20260815-2',
-  './assets/resilience.css?v=20260815-2',
-  './assets/gallery.css?v=20260815-2',
-  './assets/data.js?v=20260815-2',
-  './assets/app.js?v=20260815-2',
-  './assets/resilience.js?v=20260815-2',
-  './thumbnails/1_thumb_v4.jpg?v=20260815-2'
+  './assets/styles.css?v=20260815-3',
+  './assets/resilience.css?v=20260815-3',
+  './assets/gallery.css?v=20260815-3',
+  './assets/data.js?v=20260815-3',
+  './assets/app.js?v=20260815-3',
+  './assets/resilience.js?v=20260815-3',
+  './thumbnails/1_thumb_v4.jpg?v=20260815-3'
 ];
 
 self.addEventListener('install', event => {

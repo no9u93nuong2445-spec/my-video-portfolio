@@ -74,6 +74,8 @@
 }
 .work-card, .work-card.is-visible {
   display: block;
+  width: 100%;
+  min-width: 0;
   grid-row-end: auto !important;
   aspect-ratio: auto;
   overflow: visible;
@@ -89,6 +91,10 @@
 .work-card--landscape { grid-column: span 2; }
 .work-card__media {
   position: relative;
+  inset: auto;
+  display: block;
+  width: 100%;
+  min-width: 0;
   aspect-ratio: 9 / 16;
   overflow: hidden;
   border-radius: 10px;
@@ -100,7 +106,7 @@
   background: linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, .28));
   opacity: 1;
 }
-/* Always make the cover occupy the whole media frame. This fixes the old first-card grey block. */
+/* Always make the cover occupy the whole media frame. */
 .work-card__image,
 .work-card__preview {
   position: absolute;
@@ -146,6 +152,8 @@
 .work-card__play svg { width: 24%; }
 .work-card__caption {
   display: flex;
+  width: 100%;
+  min-width: 0;
   align-items: baseline;
   justify-content: space-between;
   gap: 10px;
