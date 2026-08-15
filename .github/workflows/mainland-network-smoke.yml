@@ -11,19 +11,15 @@ permissions:
   contents: read
 
 jobs:
-  seventeen-ce:
+  tance:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-
       - name: Prepare headless browser
         shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install --disable-pip-version-check --quiet selenium
-
-      - name: Run 17CE China mainland HTTP test
+        run: python -m pip install --disable-pip-version-check --quiet selenium
+      - name: Run mainland website-speed probe
         shell: bash
         run: |
           python - <<'PY'
@@ -34,89 +30,74 @@ jobs:
           from selenium.webdriver.support.ui import WebDriverWait
           from selenium.webdriver.support import expected_conditions as EC
 
-          TARGET = 'https://works.devs.surf/'
-          opts = Options()
-          opts.page_load_strategy = 'eager'
-          opts.add_argument('--headless=new')
-          opts.add_argument('--no-sandbox')
-          opts.add_argument('--disable-dev-shm-usage')
-          opts.add_argument('--window-size=1440,1800')
-          opts.add_argument('--lang=zh-CN')
-          opts.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36')
-
-          driver = webdriver.Chrome(options=opts)
-          driver.set_page_load_timeout(35)
+          TARGET='works.devs.surf'
+          opts=Options(); opts.page_load_strategy='eager'
+          for a in ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1440,1800','--lang=zh-CN']:
+              opts.add_argument(a)
+          opts.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151.0.0.0 Safari/537.36')
+          d=webdriver.Chrome(options=opts); d.set_page_load_timeout(40)
           try:
-              try:
-                  driver.get('https://www.17ce.com/site?lang=zh_cn')
-              except Exception as exc:
-                  print('page-load warning:', type(exc).__name__, str(exc)[:180])
-                  try: driver.execute_script('window.stop();')
+              try: d.get('https://www.tance.cc/')
+              except Exception as e:
+                  print('page-load warning', type(e).__name__, str(e)[:160]); d.execute_script('window.stop()')
+              w=WebDriverWait(d,45)
+              time.sleep(5)
+              print('title=',d.title); print('url=',d.current_url)
+
+              # Switch to website-speed mode when the tab is available.
+              for el in d.find_elements(By.XPATH,"//*[normalize-space(text())='网站测速']"):
+                  if el.is_displayed():
+                      try: d.execute_script('arguments[0].click()',el); time.sleep(2); break
+                      except Exception: pass
+
+              inputs=d.find_elements(By.CSS_SELECTOR,'input')
+              target_input=None
+              for el in inputs:
+                  try:
+                      ph=(el.get_attribute('placeholder') or '')
+                      if el.is_displayed() and ('域名' in ph or 'IP' in ph):
+                          target_input=el; break
                   except Exception: pass
+              if not target_input:
+                  raise RuntimeError('tance target input not found')
+              target_input.clear(); target_input.send_keys(TARGET)
 
-              wait = WebDriverWait(driver, 45)
-              url_input = wait.until(EC.presence_of_element_located((By.ID, 'url')))
-              submit = wait.until(EC.presence_of_element_located((By.ID, 'su')))
-              url_input.clear()
-              url_input.send_keys(TARGET)
+              # Prefer the three mainland consumer networks; if labels are custom, default selection still includes them.
+              body_before=d.find_element(By.TAG_NAME,'body').text
+              print('=== BEFORE SUBMIT EXCERPT ===')
+              for line in [x.strip() for x in body_before.splitlines() if x.strip()][:80]: print(line)
 
-              driver.execute_script("""
-                function setCheck(id, value) {
-                  const el = document.getElementById(id);
-                  if (!el) throw new Error('missing checkbox ' + id);
-                  el.checked = value;
-                  el.dispatchEvent(new Event('change', {bubbles:true}));
-                }
-                for (let i=0; i<=10; i++) setCheck('isp'+i, false);
-                setCheck('isp1', true); setCheck('isp2', true); setCheck('isp4', true);
-                for (let i=0; i<=3; i++) setCheck('area'+i, false);
-                setCheck('area1', true);
-                for (let i=0; i<=2; i++) setCheck('ntype'+i, false);
-                setCheck('ntype0', true);
-                const rt1 = document.getElementById('rt1'); if (rt1) rt1.checked = true;
-              """)
+              clicked=False
+              for text in ('单次检测','开始检测','检测'):
+                  for el in d.find_elements(By.XPATH,f"//*[normalize-space(text())='{text}']"):
+                      if el.is_displayed():
+                          try: d.execute_script('arguments[0].click()',el); clicked=True; break
+                          except Exception: pass
+                  if clicked: break
+              if not clicked: raise RuntimeError('tance submit button not found')
 
-              selected = driver.execute_script("""return {
-                url: document.getElementById('url').value,
-                telecom: document.getElementById('isp1').checked,
-                unicom: document.getElementById('isp2').checked,
-                mobile: document.getElementById('isp4').checked,
-                mainland: document.getElementById('area1').checked
-              };""")
-              print('=== SUBMIT SETTINGS ==='); print(selected)
-              driver.execute_script('arguments[0].click();', submit)
-
-              deadline = time.time() + 210
-              last_over = None
-              while time.time() < deadline:
+              deadline=time.time()+210; last=''
+              while time.time()<deadline:
                   time.sleep(4)
-                  over = driver.execute_script("return document.getElementById('ajax_over')?.value || null")
-                  node_count = driver.execute_script("return document.getElementById('node_count')?.value || null")
-                  if over != last_over:
-                      print('progress ajax_over=', over, 'node_count=', node_count)
-                      last_over = over
-                  body = driver.find_element(By.TAG_NAME, 'body').text
-                  if over == '1':
-                      time.sleep(6); break
-                  if '立即查看结果' in body and any(x in body for x in ('电信','联通','移动')):
-                      time.sleep(8); break
-              else:
-                  print('timeout-state body excerpt:')
-                  print('\n'.join(driver.find_element(By.TAG_NAME,'body').text.splitlines()[:120]))
-                  raise RuntimeError('17CE mainland test did not finish within 210 seconds')
-
-              body = driver.find_element(By.TAG_NAME, 'body').text
-              lines = [line.strip() for line in body.splitlines() if line.strip()]
-              print('=== 17CE FINAL URL ==='); print(driver.current_url)
-              print('=== TARGET ==='); print(TARGET)
-              print('=== RESULT EXCERPT ===')
+                  body=d.find_element(By.TAG_NAME,'body').text
+                  # Tance streams node results. Finish when the page reports 100% or enough rows exist and progress has stopped.
+                  interesting=[x.strip() for x in body.splitlines() if any(k in x for k in ('电信','联通','移动','ms','超时','失败','成功','100%'))]
+                  sig='|'.join(interesting[-10:])
+                  if sig!=last:
+                      print('progress-tail:', interesting[-10:]); last=sig
+                  if '100%' in body and all(k in body for k in ('电信','联通','移动')):
+                      time.sleep(5); break
+              body=d.find_element(By.TAG_NAME,'body').text
+              lines=[x.strip() for x in body.splitlines() if x.strip()]
+              print('=== TANCE TARGET ==='); print(TARGET)
+              print('=== TANCE RESULT EXCERPT ===')
+              emitted=0
               for line in lines:
-                  if any(k in line for k in ('电信','联通','移动','最快节点','最慢节点','平均响应','平均速度','超时','失败','错误','响应','速度')):
-                      print(line)
-              print('=== RESULT STATE ===')
-              print('ajax_over=', driver.execute_script("return document.getElementById('ajax_over')?.value"))
-              print('node_count=', driver.execute_script("return document.getElementById('node_count')?.value"))
-              print('resulturl=', driver.execute_script("return document.getElementById('resulturl')?.value"))
+                  if any(k in line for k in ('电信','联通','移动','响应','耗时','首字节','状态','超时','失败','成功','ms','100%')):
+                      print(line); emitted+=1
+                      if emitted>=240: break
+              if not any(k in body for k in ('电信','联通','移动')):
+                  raise RuntimeError('tance result did not contain mainland ISP rows')
           finally:
-              driver.quit()
+              d.quit()
           PY
