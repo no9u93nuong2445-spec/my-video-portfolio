@@ -21,11 +21,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          google-chrome --version || chromium --version || true
-          chromedriver --version || true
           python -m pip install --disable-pip-version-check --quiet selenium
 
-      - name: Diagnose 17CE mainland test page
+      - name: Run 17CE China mainland HTTP test
         shell: bash
         run: |
           python - <<'PY'
@@ -33,6 +31,8 @@ jobs:
           from selenium import webdriver
           from selenium.webdriver.common.by import By
           from selenium.webdriver.chrome.options import Options
+
+          TARGET = 'https://works.devs.surf/'
 
           opts = Options()
           opts.add_argument('--headless=new')
@@ -46,47 +46,91 @@ jobs:
           driver.set_page_load_timeout(60)
           try:
               driver.get('https://www.17ce.com/site?lang=zh_cn')
-              time.sleep(10)
-              print('=== 17CE PAGE DIAGNOSTIC ===')
-              print('title:', driver.title)
-              print('url:', driver.current_url)
-              body = driver.find_element(By.TAG_NAME, 'body').text
-              print('body-preview:')
-              for line in [x.strip() for x in body.splitlines() if x.strip()][:120]:
-                  print(line)
+              time.sleep(8)
 
-              candidates = driver.find_elements(By.CSS_SELECTOR, 'input, textarea, [contenteditable="true"]')
-              print('=== FORM CANDIDATES ===')
-              print('candidate-count:', len(candidates))
-              for i, el in enumerate(candidates[:80]):
-                  try:
-                      rect = el.rect
-                      print('candidate', i,
-                            'tag=', el.tag_name,
-                            'type=', el.get_attribute('type'),
-                            'placeholder=', repr(el.get_attribute('placeholder')),
-                            'name=', repr(el.get_attribute('name')),
-                            'id=', repr(el.get_attribute('id')),
-                            'class=', repr(el.get_attribute('class')),
-                            'value=', repr(el.get_attribute('value')),
-                            'visible=', el.is_displayed(),
-                            'rect=', rect)
-                  except Exception as exc:
-                      print('candidate-error', i, exc)
+              url_input = driver.find_element(By.ID, 'url')
+              url_input.clear()
+              url_input.send_keys(TARGET)
 
-              print('=== CLICKABLE TEXT ===')
-              clickables = driver.find_elements(By.CSS_SELECTOR, 'button, a, [role="button"], input[type="button"], input[type="submit"]')
-              emitted = 0
-              for i, el in enumerate(clickables):
+              # Restrict this run to mainland China and the three major consumer ISPs.
+              # The checkboxes are visually custom/hidden, so update them through JS and fire change events.
+              driver.execute_script("""
+                function setCheck(id, value) {
+                  const el = document.getElementById(id);
+                  if (!el) throw new Error('missing checkbox ' + id);
+                  el.checked = value;
+                  el.dispatchEvent(new Event('change', {bubbles:true}));
+                  el.dispatchEvent(new Event('click', {bubbles:true}));
+                  el.checked = value;
+                }
+                for (let i=0; i<=10; i++) setCheck('isp'+i, false);
+                setCheck('isp1', true);  // China Telecom
+                setCheck('isp2', true);  // China Unicom
+                setCheck('isp4', true);  // China Mobile
+                for (let i=0; i<=3; i++) setCheck('area'+i, false);
+                setCheck('area1', true); // Chinese mainland
+                for (let i=0; i<=2; i++) setCheck('ntype'+i, false);
+                setCheck('ntype0', true); // all node types
+                const rt1 = document.getElementById('rt1');
+                if (rt1) { rt1.checked = true; rt1.dispatchEvent(new Event('change',{bubbles:true})); }
+              """)
+
+              selected = driver.execute_script("""
+                return {
+                  url: document.getElementById('url').value,
+                  isp1: document.getElementById('isp1').checked,
+                  isp2: document.getElementById('isp2').checked,
+                  isp4: document.getElementById('isp4').checked,
+                  area1: document.getElementById('area1').checked,
+                  ntype0: document.getElementById('ntype0').checked
+                };
+              """)
+              print('=== SUBMIT SETTINGS ===')
+              print(selected)
+
+              submit = driver.find_element(By.ID, 'su')
+              driver.execute_script('arguments[0].click();', submit)
+
+              deadline = time.time() + 240
+              last_over = None
+              while time.time() < deadline:
+                  time.sleep(4)
                   try:
-                      text = (el.text or el.get_attribute('value') or '').strip()
-                      if text and el.is_displayed():
-                          print('clickable', i, repr(text), 'tag=', el.tag_name, 'id=', repr(el.get_attribute('id')), 'class=', repr(el.get_attribute('class')))
-                          emitted += 1
-                          if emitted >= 120:
-                              break
+                      over = driver.find_element(By.ID, 'ajax_over').get_attribute('value')
                   except Exception:
-                      pass
+                      over = None
+                  if over != last_over:
+                      print('ajax_over=', over)
+                      last_over = over
+                  body = driver.find_element(By.TAG_NAME, 'body').text
+                  # 17CE exposes a final-result action once the sampled nodes have returned.
+                  if over == '1' or ('立即查看结果' in body and TARGET.replace('https://','').strip('/') in body):
+                      time.sleep(5)
+                      break
+              else:
+                  raise RuntimeError('17CE mainland test did not finish within 240 seconds')
+
+              body = driver.find_element(By.TAG_NAME, 'body').text
+              lines = [line.strip() for line in body.splitlines() if line.strip()]
+              print('=== 17CE FINAL URL ===')
+              print(driver.current_url)
+              print('=== TARGET ===')
+              print(TARGET)
+              print('=== RESULT EXCERPT ===')
+              # Print the result section and all lines mentioning the three major ISPs / errors / timings.
+              keys = ('电信', '联通', '移动', '最快节点', '最慢节点', '平均响应', '平均速度', '超时', '失败', '错误', 's', 'ms')
+              emitted = 0
+              for line in lines:
+                  if any(k in line for k in keys):
+                      print(line)
+                      emitted += 1
+                      if emitted >= 180:
+                          break
+
+              print('=== RESULT STATE ===')
+              print('ajax_over=', driver.find_element(By.ID, 'ajax_over').get_attribute('value'))
+              print('node_count=', driver.find_element(By.ID, 'node_count').get_attribute('value'))
+              print('resulturl=', driver.find_element(By.ID, 'resulturl').get_attribute('value'))
           finally:
               driver.quit()
           PY
