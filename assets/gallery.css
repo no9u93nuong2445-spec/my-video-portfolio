@@ -91,7 +91,7 @@
   position: relative;
   aspect-ratio: 9 / 16;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 10px;
   background: #111315;
   box-shadow: 0 12px 34px rgba(0, 0, 0, .18);
 }
@@ -100,7 +100,17 @@
   background: linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, .28));
   opacity: 1;
 }
-.work-card__image, .work-card__preview {
+/* Always make the cover occupy the whole media frame. This fixes the old first-card grey block. */
+.work-card__image,
+.work-card__preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  background: #111315;
   filter: none;
   transition: transform .55s var(--ease-spring);
 }
@@ -186,23 +196,36 @@
 }
 .player__stage { border-radius: 6px; }
 
-@media (max-width: 860px) {
+/* Treat narrow/desktop-mode phone viewports as mobile too. */
+@media (max-width: 1180px) {
   .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .work-card--landscape { grid-column: span 2; }
   .section-heading { align-items: flex-start; flex-direction: column; gap: 20px; }
+  .filters {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter { flex: 0 0 auto; min-height: 38px; padding-inline: 15px; }
 }
 @media (max-width: 460px) {
   .site-header { padding-inline: 18px; }
   .header-meta { font-size: 10px; }
   .gallery-section { padding-inline: 14px; }
-  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 25px 10px; }
+  .section-heading h1 { font-size: 42px; }
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 10px; }
   .work-card--landscape { grid-column: span 2; }
+  .work-card__media { border-radius: 12px; }
   .work-card__duration { top: 8px; right: 8px; font-size: 9px; }
   .work-card__caption { padding-top: 10px; }
-  .work-card__title { font-size: 13px; }
-  .work-card__meta { font-size: 9px; }
+  .work-card__title { font-size: 14px; }
+  .work-card__meta { font-size: 10px; }
   .work-card__number { display: none; }
-  .work-card__play { width: 42px; height: 42px; opacity: .92; }
+  .work-card__play { width: 44px; height: 44px; opacity: .92; }
 }
 @media (hover: none), (pointer: coarse) {
   .work-card__play {
