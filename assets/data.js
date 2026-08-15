@@ -1,11 +1,10 @@
 // Video delivery stays inside the current GitHub repository.
-// We keep two jsDelivr network entry points plus the same-origin GitHub Pages URL.
-// The player probes them in parallel and selects whichever actually responds first.
+// Mainland multi-node validation showed standard jsDelivr is materially more reliable than the Fastly entry point.
+// The player now races standard jsDelivr against same-origin GitHub Pages and keeps quality fallback intact.
 window.MOTION_ASSET_CDNS = [
-  { name: 'fastly', base: 'https://fastly.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/' },
   { name: 'jsdelivr', base: 'https://cdn.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/' }
 ];
-window.MOTION_ASSET_VERSION = '20260815-4';
+window.MOTION_ASSET_VERSION = '20260815-5';
 window.MOTION_DEFAULT_QUALITY = 'smooth';
 
 // Curated order: landscape showcase first, then portrait showcase.
