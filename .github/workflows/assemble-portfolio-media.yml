@@ -26,7 +26,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet gdown
-          gdown --id 1bPgCKtjFP1JlPfOOib3d830sdzBgnsZv --output portfolio-three-videos-bundle.zip
+          gdown 1bPgCKtjFP1JlPfOOib3d830sdzBgnsZv -O portfolio-three-videos-bundle.zip
           test -s portfolio-three-videos-bundle.zip
 
       - name: Verify upload bundle
