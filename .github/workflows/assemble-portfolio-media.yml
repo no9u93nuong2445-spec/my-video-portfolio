@@ -5,7 +5,7 @@ on:
     branches:
       - agent/add-three-videos-20260815
     paths:
-      - portfolio-three-videos-bundle.zip
+      - .drive-media-trigger
 
 permissions:
   contents: write
@@ -21,11 +21,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Download upload bundle from Google Drive
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet gdown
+          gdown --id 1bPgCKtjFP1JlPfOOib3d830sdzBgnsZv --output portfolio-three-videos-bundle.zip
+          test -s portfolio-three-videos-bundle.zip
+
       - name: Verify upload bundle
         shell: bash
         run: |
           set -euo pipefail
-          test -s portfolio-three-videos-bundle.zip
           echo "29124a7796f60c97034602dd2015ca162ad5fbda54f4d1b08164551463bc314e  portfolio-three-videos-bundle.zip" | sha256sum -c -
 
       - name: Unpack and verify HD media
@@ -112,7 +119,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .media-staging .upload portfolio-three-videos-bundle.zip
+          rm -rf .media-staging .upload portfolio-three-videos-bundle.zip .drive-media-trigger
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
