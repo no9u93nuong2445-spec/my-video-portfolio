@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  tance:
+  tance-video:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -19,7 +19,7 @@ jobs:
       - name: Prepare headless browser
         shell: bash
         run: python -m pip install --disable-pip-version-check --quiet selenium
-      - name: Run mainland website-speed probe
+      - name: Probe smooth video from mainland nodes
         shell: bash
         run: |
           python - <<'PY'
@@ -27,10 +27,8 @@ jobs:
           from selenium import webdriver
           from selenium.webdriver.common.by import By
           from selenium.webdriver.chrome.options import Options
-          from selenium.webdriver.support.ui import WebDriverWait
-          from selenium.webdriver.support import expected_conditions as EC
 
-          TARGET='works.devs.surf'
+          TARGET='https://works.devs.surf/videos-lite/18.mp4'
           opts=Options(); opts.page_load_strategy='eager'
           for a in ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1440,1800','--lang=zh-CN']:
               opts.add_argument(a)
@@ -39,65 +37,53 @@ jobs:
           try:
               try: d.get('https://www.tance.cc/')
               except Exception as e:
-                  print('page-load warning', type(e).__name__, str(e)[:160]); d.execute_script('window.stop()')
-              w=WebDriverWait(d,45)
-              time.sleep(5)
-              print('title=',d.title); print('url=',d.current_url)
-
-              # Switch to website-speed mode when the tab is available.
+                  print('page-load warning',type(e).__name__,str(e)[:160]); d.execute_script('window.stop()')
+              time.sleep(6)
               for el in d.find_elements(By.XPATH,"//*[normalize-space(text())='网站测速']"):
                   if el.is_displayed():
-                      try: d.execute_script('arguments[0].click()',el); time.sleep(2); break
-                      except Exception: pass
-
-              inputs=d.find_elements(By.CSS_SELECTOR,'input')
+                      d.execute_script('arguments[0].click()',el); time.sleep(2); break
               target_input=None
-              for el in inputs:
-                  try:
-                      ph=(el.get_attribute('placeholder') or '')
-                      if el.is_displayed() and ('域名' in ph or 'IP' in ph):
-                          target_input=el; break
-                  except Exception: pass
-              if not target_input:
-                  raise RuntimeError('tance target input not found')
+              for el in d.find_elements(By.CSS_SELECTOR,'input'):
+                  ph=(el.get_attribute('placeholder') or '')
+                  if el.is_displayed() and ('域名' in ph or 'IP' in ph): target_input=el; break
+              if not target_input: raise RuntimeError('target input missing')
               target_input.clear(); target_input.send_keys(TARGET)
-
-              # Prefer the three mainland consumer networks; if labels are custom, default selection still includes them.
-              body_before=d.find_element(By.TAG_NAME,'body').text
-              print('=== BEFORE SUBMIT EXCERPT ===')
-              for line in [x.strip() for x in body_before.splitlines() if x.strip()][:80]: print(line)
-
+              print('input-value=',target_input.get_attribute('value'))
               clicked=False
-              for text in ('单次检测','开始检测','检测'):
+              for text in ('检测','单次检测','开始检测'):
                   for el in d.find_elements(By.XPATH,f"//*[normalize-space(text())='{text}']"):
-                      if el.is_displayed():
-                          try: d.execute_script('arguments[0].click()',el); clicked=True; break
-                          except Exception: pass
+                      if el.is_displayed(): d.execute_script('arguments[0].click()',el); clicked=True; break
                   if clicked: break
-              if not clicked: raise RuntimeError('tance submit button not found')
-
-              deadline=time.time()+210; last=''
+              if not clicked: raise RuntimeError('submit missing')
+              # Result rows stream quickly; wait until carrier summary and many node rows appear.
+              deadline=time.time()+180
+              body=''
               while time.time()<deadline:
-                  time.sleep(4)
-                  body=d.find_element(By.TAG_NAME,'body').text
-                  # Tance streams node results. Finish when the page reports 100% or enough rows exist and progress has stopped.
-                  interesting=[x.strip() for x in body.splitlines() if any(k in x for k in ('电信','联通','移动','ms','超时','失败','成功','100%'))]
-                  sig='|'.join(interesting[-10:])
-                  if sig!=last:
-                      print('progress-tail:', interesting[-10:]); last=sig
-                  if '100%' in body and all(k in body for k in ('电信','联通','移动')):
+                  time.sleep(4); body=d.find_element(By.TAG_NAME,'body').text
+                  nodes=sum(1 for line in body.splitlines() if line.strip().startswith(('电信','联通','移动')))
+                  if nodes>=30 and all(k in body for k in ('中国电信','中国联通','中国移动')):
                       time.sleep(5); break
-              body=d.find_element(By.TAG_NAME,'body').text
               lines=[x.strip() for x in body.splitlines() if x.strip()]
-              print('=== TANCE TARGET ==='); print(TARGET)
-              print('=== TANCE RESULT EXCERPT ===')
-              emitted=0
-              for line in lines:
-                  if any(k in line for k in ('电信','联通','移动','响应','耗时','首字节','状态','超时','失败','成功','ms','100%')):
-                      print(line); emitted+=1
-                      if emitted>=240: break
-              if not any(k in body for k in ('电信','联通','移动')):
-                  raise RuntimeError('tance result did not contain mainland ISP rows')
+              print('=== PAGE HEAD AFTER PROBE ===')
+              for line in lines[:60]: print(line)
+              print('=== CARRIER SUMMARY ===')
+              for isp in ('中国电信','中国移动','中国联通'):
+                  try:
+                      i=lines.index(isp); print(isp, ' | '.join(lines[i:i+3]))
+                  except ValueError: print(isp,'NOT FOUND')
+              print('=== RESULT TABLE ROWS ===')
+              rows=[]
+              for tr in d.find_elements(By.CSS_SELECTOR,'tr'):
+                  txt=' '.join((tr.text or '').split())
+                  if txt and any(x in txt for x in ('电信','联通','移动')):
+                      rows.append(txt)
+              for row in rows[:160]: print(row)
+              print('row-count=',len(rows))
+              print('=== BODY STATUS TOKENS ===')
+              for token in ('200','206','超时','失败','成功','错误'):
+                  print(token, body.count(token))
+              if not all(k in body for k in ('中国电信','中国联通','中国移动')):
+                  raise RuntimeError('no valid three-carrier result')
           finally:
               d.quit()
           PY
