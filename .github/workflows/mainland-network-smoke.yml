@@ -31,10 +31,12 @@ jobs:
           from selenium import webdriver
           from selenium.webdriver.common.by import By
           from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+          from selenium.webdriver.support import expected_conditions as EC
 
           TARGET = 'https://works.devs.surf/'
-
           opts = Options()
+          opts.page_load_strategy = 'eager'
           opts.add_argument('--headless=new')
           opts.add_argument('--no-sandbox')
           opts.add_argument('--disable-dev-shm-usage')
@@ -43,94 +45,78 @@ jobs:
           opts.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36')
 
           driver = webdriver.Chrome(options=opts)
-          driver.set_page_load_timeout(60)
+          driver.set_page_load_timeout(35)
           try:
-              driver.get('https://www.17ce.com/site?lang=zh_cn')
-              time.sleep(8)
+              try:
+                  driver.get('https://www.17ce.com/site?lang=zh_cn')
+              except Exception as exc:
+                  print('page-load warning:', type(exc).__name__, str(exc)[:180])
+                  try: driver.execute_script('window.stop();')
+                  except Exception: pass
 
-              url_input = driver.find_element(By.ID, 'url')
+              wait = WebDriverWait(driver, 45)
+              url_input = wait.until(EC.presence_of_element_located((By.ID, 'url')))
+              submit = wait.until(EC.presence_of_element_located((By.ID, 'su')))
               url_input.clear()
               url_input.send_keys(TARGET)
 
-              # Restrict this run to mainland China and the three major consumer ISPs.
-              # The checkboxes are visually custom/hidden, so update them through JS and fire change events.
               driver.execute_script("""
                 function setCheck(id, value) {
                   const el = document.getElementById(id);
                   if (!el) throw new Error('missing checkbox ' + id);
                   el.checked = value;
                   el.dispatchEvent(new Event('change', {bubbles:true}));
-                  el.dispatchEvent(new Event('click', {bubbles:true}));
-                  el.checked = value;
                 }
                 for (let i=0; i<=10; i++) setCheck('isp'+i, false);
-                setCheck('isp1', true);  // China Telecom
-                setCheck('isp2', true);  // China Unicom
-                setCheck('isp4', true);  // China Mobile
+                setCheck('isp1', true); setCheck('isp2', true); setCheck('isp4', true);
                 for (let i=0; i<=3; i++) setCheck('area'+i, false);
-                setCheck('area1', true); // Chinese mainland
+                setCheck('area1', true);
                 for (let i=0; i<=2; i++) setCheck('ntype'+i, false);
-                setCheck('ntype0', true); // all node types
-                const rt1 = document.getElementById('rt1');
-                if (rt1) { rt1.checked = true; rt1.dispatchEvent(new Event('change',{bubbles:true})); }
+                setCheck('ntype0', true);
+                const rt1 = document.getElementById('rt1'); if (rt1) rt1.checked = true;
               """)
 
-              selected = driver.execute_script("""
-                return {
-                  url: document.getElementById('url').value,
-                  isp1: document.getElementById('isp1').checked,
-                  isp2: document.getElementById('isp2').checked,
-                  isp4: document.getElementById('isp4').checked,
-                  area1: document.getElementById('area1').checked,
-                  ntype0: document.getElementById('ntype0').checked
-                };
-              """)
-              print('=== SUBMIT SETTINGS ===')
-              print(selected)
-
-              submit = driver.find_element(By.ID, 'su')
+              selected = driver.execute_script("""return {
+                url: document.getElementById('url').value,
+                telecom: document.getElementById('isp1').checked,
+                unicom: document.getElementById('isp2').checked,
+                mobile: document.getElementById('isp4').checked,
+                mainland: document.getElementById('area1').checked
+              };""")
+              print('=== SUBMIT SETTINGS ==='); print(selected)
               driver.execute_script('arguments[0].click();', submit)
 
-              deadline = time.time() + 240
+              deadline = time.time() + 210
               last_over = None
               while time.time() < deadline:
                   time.sleep(4)
-                  try:
-                      over = driver.find_element(By.ID, 'ajax_over').get_attribute('value')
-                  except Exception:
-                      over = None
+                  over = driver.execute_script("return document.getElementById('ajax_over')?.value || null")
+                  node_count = driver.execute_script("return document.getElementById('node_count')?.value || null")
                   if over != last_over:
-                      print('ajax_over=', over)
+                      print('progress ajax_over=', over, 'node_count=', node_count)
                       last_over = over
                   body = driver.find_element(By.TAG_NAME, 'body').text
-                  # 17CE exposes a final-result action once the sampled nodes have returned.
-                  if over == '1' or ('立即查看结果' in body and TARGET.replace('https://','').strip('/') in body):
-                      time.sleep(5)
-                      break
+                  if over == '1':
+                      time.sleep(6); break
+                  if '立即查看结果' in body and any(x in body for x in ('电信','联通','移动')):
+                      time.sleep(8); break
               else:
-                  raise RuntimeError('17CE mainland test did not finish within 240 seconds')
+                  print('timeout-state body excerpt:')
+                  print('\n'.join(driver.find_element(By.TAG_NAME,'body').text.splitlines()[:120]))
+                  raise RuntimeError('17CE mainland test did not finish within 210 seconds')
 
               body = driver.find_element(By.TAG_NAME, 'body').text
               lines = [line.strip() for line in body.splitlines() if line.strip()]
-              print('=== 17CE FINAL URL ===')
-              print(driver.current_url)
-              print('=== TARGET ===')
-              print(TARGET)
+              print('=== 17CE FINAL URL ==='); print(driver.current_url)
+              print('=== TARGET ==='); print(TARGET)
               print('=== RESULT EXCERPT ===')
-              # Print the result section and all lines mentioning the three major ISPs / errors / timings.
-              keys = ('电信', '联通', '移动', '最快节点', '最慢节点', '平均响应', '平均速度', '超时', '失败', '错误', 's', 'ms')
-              emitted = 0
               for line in lines:
-                  if any(k in line for k in keys):
+                  if any(k in line for k in ('电信','联通','移动','最快节点','最慢节点','平均响应','平均速度','超时','失败','错误','响应','速度')):
                       print(line)
-                      emitted += 1
-                      if emitted >= 180:
-                          break
-
               print('=== RESULT STATE ===')
-              print('ajax_over=', driver.find_element(By.ID, 'ajax_over').get_attribute('value'))
-              print('node_count=', driver.find_element(By.ID, 'node_count').get_attribute('value'))
-              print('resulturl=', driver.find_element(By.ID, 'resulturl').get_attribute('value'))
+              print('ajax_over=', driver.execute_script("return document.getElementById('ajax_over')?.value"))
+              print('node_count=', driver.execute_script("return document.getElementById('node_count')?.value"))
+              print('resulturl=', driver.execute_script("return document.getElementById('resulturl')?.value"))
           finally:
               driver.quit()
           PY
