@@ -5,11 +5,11 @@ window.MOTION_ASSET_CDNS = [
   { name: 'fastly', base: 'https://fastly.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/' },
   { name: 'jsdelivr', base: 'https://cdn.jsdelivr.net/gh/no9u93nuong2445-spec/my-video-portfolio@main/' }
 ];
-window.MOTION_ASSET_VERSION = '20260815-1';
+window.MOTION_ASSET_VERSION = '20260815-2';
 window.MOTION_DEFAULT_QUALITY = 'smooth';
 
 window.MOTION_WORKS = [
-  { id: 1, title: '檐下听雨', subtitle: '电影感叙事短片', duration: '27.5', orientation: 'landscape', resolution: '1280×544', video: 'videos/1.mp4', thumbnail: 'thumbnails/1_thumb_v4.jpg?v=20260815-1' },
+  { id: 1, title: '檐下听雨', subtitle: '电影感叙事短片', duration: '27.5', orientation: 'landscape', resolution: '1280×544', video: 'videos/1.mp4', thumbnail: 'thumbnails/1_thumb_v4.jpg?v=20260815-2' },
   { id: 2, title: '轻商务口播', subtitle: 'AI 数字人口播', duration: '30.1', orientation: 'portrait', resolution: '720×1280', video: 'videos/2.mp4', thumbnail: 'thumbnails/2_thumb.jpg' },
   { id: 3, title: '产品开箱', subtitle: '商品视觉短片', duration: '15.1', orientation: 'portrait', resolution: '720×1280', video: 'videos/3.mp4', thumbnail: 'thumbnails/3_thumb.jpg' },
   { id: 4, title: '城市轻装', subtitle: '男装动态展示', duration: '30.2', orientation: 'portrait', resolution: '720×1280', video: 'videos/4.mp4', thumbnail: 'thumbnails/4_thumb.jpg' },
@@ -24,7 +24,7 @@ window.MOTION_WORKS = [
   { id: 13, title: '烟雨江南', subtitle: '国风氛围短片', duration: '15.0', orientation: 'portrait', resolution: '720×1280', video: 'videos/14.mp4', thumbnail: 'thumbnails/14_thumb.jpg' },
   { id: 14, title: '夜色香氛', subtitle: '香水广告概念片', duration: '15.9', orientation: 'portrait', resolution: '720×1280', video: 'videos/15.mp4', thumbnail: 'thumbnails/15_thumb.jpg' },
   { id: 15, title: '电梯来电', subtitle: '都市悬疑叙事', duration: '40.0', orientation: 'portrait', resolution: '720×1280', video: 'videos/16.mp4', thumbnail: 'thumbnails/16_thumb.jpg' },
-  { id: 16, title: '森息香氛', subtitle: '森系香氛概念片', duration: '56.9', orientation: 'portrait', resolution: '150×266', video: 'videos-lite/17.mp4', thumbnail: 'thumbnails/17_thumb.jpg' },
-  { id: 17, title: '风停以后', subtitle: '海岸情绪叙事', duration: '24.0', orientation: 'landscape', resolution: '240×136', video: 'videos-lite/18.mp4', thumbnail: 'thumbnails/18_thumb.jpg' },
-  { id: 18, title: '云海天境', subtitle: '东方奇幻概念片', duration: '33.8', orientation: 'landscape', resolution: '240×136', video: 'videos-lite/19.mp4', thumbnail: 'thumbnails/19_thumb.jpg' }
+  { id: 16, title: '森息香氛', subtitle: '森系香氛概念片', duration: '56.9', orientation: 'portrait', resolution: '720×1280', video: 'videos/17.mp4', thumbnail: 'thumbnails/17_thumb.jpg' },
+  { id: 17, title: '风停以后', subtitle: '海岸情绪叙事', duration: '24.0', orientation: 'landscape', resolution: '1280×720', video: 'videos/18.mp4', thumbnail: 'thumbnails/18_thumb.jpg' },
+  { id: 18, title: '云海天境', subtitle: '东方奇幻概念片', duration: '33.8', orientation: 'landscape', resolution: '1280×720', video: 'videos/19.mp4', thumbnail: 'thumbnails/19_thumb.jpg' }
 ];
