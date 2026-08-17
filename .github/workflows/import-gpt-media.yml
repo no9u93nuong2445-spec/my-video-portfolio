@@ -1,0 +1,85 @@
+name: Import GPT media delivery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .gpt-media-import.json
+
+permissions:
+  contents: write
+
+jobs:
+  import-media:
+    if: ${{ !contains(github.event.head_commit.message, '[media-imported]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate import request
+        id: req
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          p=Path('.gpt-media-import.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          required=['download_url','request_id','expected_sha256','target_name']
+          for k in required:
+              if not str(d.get(k) or '').strip(): raise SystemExit(f'missing {k}')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{4,100}', d['request_id']): raise SystemExit('bad request_id')
+          if not re.fullmatch(r'[0-9a-f]{64}', d['expected_sha256']): raise SystemExit('bad sha256')
+          name=Path(d['target_name']).name
+          if not name.lower().endswith(('.mp4','.wav','.mp3','.m4a','.webm')): raise SystemExit('unsupported media extension')
+          out=Path(os.environ['GITHUB_OUTPUT'])
+          with out.open('a',encoding='utf-8') as f:
+              f.write(f"url={d['download_url']}\n")
+              f.write(f"request_id={d['request_id']}\n")
+              f.write(f"sha256={d['expected_sha256']}\n")
+              f.write(f"target_name={name}\n")
+          PY
+
+      - name: Download and extract existing artifact
+        shell: bash
+        env:
+          DOWNLOAD_URL: ${{ steps.req.outputs.url }}
+          EXPECTED_SHA256: ${{ steps.req.outputs.sha256 }}
+          TARGET_NAME: ${{ steps.req.outputs.target_name }}
+          REQUEST_ID: ${{ steps.req.outputs.request_id }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/gpt-media-import
+          mkdir -p /tmp/gpt-media-import
+          curl --fail --location --retry 2 --retry-delay 1 "$DOWNLOAD_URL" -o /tmp/gpt-media-import/artifact.zip
+          unzip -q /tmp/gpt-media-import/artifact.zip -d /tmp/gpt-media-import/unpacked
+          src="$(find /tmp/gpt-media-import/unpacked -type f -name "$TARGET_NAME" | head -n 1)"
+          test -n "$src"
+          echo "$EXPECTED_SHA256  $src" | sha256sum -c -
+          dest_dir="downloads/gpt-media/$(date -u +%Y%m)"
+          mkdir -p "$dest_dir"
+          dest="$dest_dir/${REQUEST_ID}-${TARGET_NAME}"
+          cp "$src" "$dest"
+          echo "DEST=$dest" >> "$GITHUB_ENV"
+
+      - name: Commit public delivery file
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .gpt-media-import.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST" .gpt-media-import.json
+          git commit -m "Publish GPT media ${DEST##*/} [media-imported]"
+          git push origin HEAD:main
+
+      - name: Summary
+        shell: bash
+        run: |
+          echo "# Public GPT media delivery" >> "$GITHUB_STEP_SUMMARY"
+          echo "- path: $DEST" >> "$GITHUB_STEP_SUMMARY"
+          echo "- raw: https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/$DEST" >> "$GITHUB_STEP_SUMMARY"
